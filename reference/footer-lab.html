@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Footer Lab / Solstice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300..700&family=Unbounded:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --sol-night:#0b0b0c;
+  --sol-night-panel:#141416;
+  --sol-night-deep:#050506;
+  --sol-lit:#f0ece2;
+  --sol-accent:#8a7a4e;
+  --sol-accent-lit:#f5e9c8;
+  --sol-dusk:#cfc9ba;
+  --font-display:'Albert Sans',system-ui,sans-serif;
+  --font-accent:'Unbounded','Albert Sans',system-ui,sans-serif;
+  --ink:var(--sol-lit);
+  --soft:rgba(240,236,226,.62);
+  --faint:rgba(240,236,226,.34);
+  --line:rgba(240,236,226,.12);
+}
+body{margin:0;background:var(--sol-night-deep);color:var(--ink);font-family:var(--font-display);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img{display:block;max-width:100%}
+
+/* ---------- lab chrome ---------- */
+.lab-top{padding:clamp(48px,9vh,110px) clamp(24px,4.4vw,64px) 0;max-width:1500px;margin:0 auto}
+.lab-top h1{font-size:clamp(2rem,4.4vw,3.4rem);font-weight:500;letter-spacing:-.045em;line-height:1;margin:0 0 18px}
+.lab-top p{max-width:62ch;color:var(--soft);line-height:1.62;margin:0 0 34px;font-size:1.02rem}
+.lab-jump{display:flex;flex-wrap:wrap;gap:10px;padding:0 0 clamp(40px,7vh,90px);margin:0;list-style:none}
+.lab-jump a{display:inline-flex;align-items:center;gap:10px;height:44px;padding:0 20px;border:1px solid var(--line);border-radius:999px;text-decoration:none;font-size:13.5px;color:var(--soft);transition:color .2s,border-color .2s,transform .2s}
+.lab-jump a:hover{color:var(--ink);border-color:rgba(240,236,226,.4);transform:translateY(-2px)}
+.lab-jump b{font-family:var(--font-accent);font-weight:400;font-size:12px;color:var(--sol-accent-lit)}
+
+.slab{border-top:1px solid var(--line)}
+.slab-head{max-width:1500px;margin:0 auto;padding:clamp(38px,6vh,64px) clamp(24px,4.4vw,64px) clamp(26px,4vh,40px);display:grid;grid-template-columns:auto 1fr;gap:clamp(18px,3vw,44px);align-items:baseline}
+.slab-num{font-family:var(--font-accent);font-weight:400;font-size:clamp(1.6rem,3vw,2.4rem);color:var(--sol-accent-lit);line-height:1}
+.slab-name{font-size:clamp(1.5rem,2.8vw,2.2rem);font-weight:500;letter-spacing:-.035em;line-height:1.05;margin:0 0 10px}
+.slab-note{margin:0;color:var(--soft);font-size:.95rem;line-height:1.6;max-width:74ch}
+.slab-note b{color:var(--ink);font-weight:600}
+.stage{position:relative;overflow:hidden}
+@media (max-width:768px){.slab-head{grid-template-columns:1fr;gap:8px}}
+
+/* ============================================================
+   01  HORIZON
+   ============================================================ */
+.hz{position:relative;min-height:96vh;background:var(--sol-night);display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;isolation:isolate}
+.hz__sun{position:absolute;left:50%;bottom:0;width:min(118vh,120vw);aspect-ratio:1;transform:translate(-50%,72%);border-radius:50%;
+  background:radial-gradient(circle at 50% 50%,rgba(245,233,200,.30) 0%,rgba(245,233,200,.13) 42%,rgba(245,233,200,.04) 66%,transparent 72%);
+  z-index:0;transition:transform 1.9s cubic-bezier(.16,1,.3,1),opacity 1.6s ease;opacity:.2}
+.hz.is-up .hz__sun{transform:translate(-50%,44%);opacity:1}
+.hz__horizon{position:absolute;left:0;right:0;bottom:34%;height:1px;background:linear-gradient(90deg,transparent,rgba(245,233,200,.55) 22%,rgba(245,233,200,.55) 78%,transparent);z-index:1;transform:scaleX(.2);transform-origin:50% 50%;transition:transform 1.5s cubic-bezier(.16,1,.3,1)}
+.hz.is-up .hz__horizon{transform:scaleX(1)}
+.hz__inner{position:relative;z-index:2;width:100%;max-width:1500px;margin:0 auto;padding:0 clamp(24px,4.4vw,64px) clamp(30px,5vh,54px)}
+.hz__type{margin:0 0 clamp(40px,8vh,96px);font-size:clamp(3.2rem,11.5vw,11rem);font-weight:500;line-height:.86;letter-spacing:-.06em}
+.hz__type span{display:block;overflow:hidden}
+.hz__type i{display:block;font-style:normal;transform:translateY(105%);transition:transform 1.15s cubic-bezier(.16,1,.3,1)}
+.hz.is-up .hz__type i{transform:translateY(0)}
+.hz__type span:nth-child(2) i{transition-delay:.09s}
+.hz__type em{font-style:normal;color:var(--sol-accent-lit)}
+.hz__grid{display:grid;grid-template-columns:1.1fr 1fr 1fr auto;gap:clamp(24px,3vw,56px);align-items:end;padding-top:clamp(22px,3vh,34px);border-top:1px solid var(--line)}
+.hz__col{display:flex;flex-direction:column;gap:11px}
+.hz__lede{color:var(--soft);font-size:14px;line-height:1.6;max-width:34ch;margin:0}
+.hz__link{font-size:14px;color:var(--soft);text-decoration:none;width:fit-content;position:relative;transition:color .2s}
+.hz__link::after{content:'';position:absolute;left:0;right:0;bottom:-3px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:0 50%;transition:transform .35s cubic-bezier(.16,1,.3,1)}
+.hz__link:hover{color:var(--ink)}
+.hz__link:hover::after{transform:scaleX(1)}
+.hz__cta{display:inline-flex;align-items:center;gap:14px;height:56px;padding:0 8px 0 26px;border-radius:999px;background:var(--sol-accent-lit);color:#0d0d0d;text-decoration:none;font-size:14.5px;font-weight:600;white-space:nowrap;transition:transform .25s cubic-bezier(.16,1,.3,1),filter .25s}
+.hz__cta:hover{transform:translateY(-2px);filter:brightness(1.05)}
+.hz__cta i{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#0d0d0d;color:var(--sol-accent-lit)}
+.hz__base{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:clamp(24px,4vh,44px);font-size:12.5px;color:var(--faint)}
+.hz__base a{text-decoration:none}
+.hz__base a:hover{color:var(--ink)}
+@media (max-width:900px){.hz__grid{grid-template-columns:1fr 1fr;gap:30px}.hz__cta{grid-column:1/-1}}
+@media (max-width:560px){.hz__grid{grid-template-columns:1fr}}
+
+/* ============================================================
+   02  LEDGER
+   ============================================================ */
+.lg{position:relative;background:var(--sol-night-deep);padding:clamp(40px,6vh,72px) 0 0;overflow:hidden}
+.lg__rule{position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:calc(100%/6) 100%;opacity:.7}
+.lg__inner{position:relative;z-index:1;max-width:1500px;margin:0 auto;padding:0 clamp(24px,4.4vw,64px)}
+.lg__head{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;padding-bottom:clamp(26px,4vh,44px)}
+.lg__title{margin:0;font-size:clamp(1.8rem,3.4vw,3rem);font-weight:500;letter-spacing:-.04em;line-height:1.02;max-width:16ch}
+.lg__meta{text-align:right;font-size:12.5px;color:var(--faint);line-height:1.9}
+.lg__rows{border-top:1px solid var(--line)}
+.lg__row{display:grid;grid-template-columns:2fr 3fr auto;gap:24px;align-items:center;padding:clamp(15px,2.1vh,22px) 0;border-bottom:1px solid var(--line);text-decoration:none;position:relative;transition:color .3s}
+/* The step-in is a transform on the two left cells rather than padding on the
+   row. Animating padding relays the whole grid out on every frame, and the
+   right-hand cell has to stay anchored to the edge anyway. */
+.lg__row-name,.lg__row-desc{transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.lg__row:hover{color:var(--sol-accent-lit)}
+.lg__row:hover .lg__row-name,.lg__row:hover .lg__row-desc{transform:translateX(22px)}
+.lg__row-name{font-size:clamp(1.15rem,2vw,1.7rem);font-weight:500;letter-spacing:-.03em}
+.lg__row-desc{font-size:13px;color:var(--soft)}
+.lg__row-go{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);transition:color .3s}
+.lg__row:hover .lg__row-go{color:var(--sol-accent-lit)}
+.lg__peek{position:fixed;top:0;left:0;width:230px;aspect-ratio:4/3;border-radius:2px;overflow:hidden;pointer-events:none;opacity:0;transform:translate(-50%,-50%) scale(.94);transition:opacity .3s ease,transform .45s cubic-bezier(.16,1,.3,1);z-index:40;border:1px solid rgba(240,236,226,.18)}
+.lg__peek.is-on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.lg__peek img{width:100%;height:100%;object-fit:cover}
+.lg__foot{display:grid;grid-template-columns:1fr 1fr 1fr;gap:clamp(24px,3vw,56px);padding:clamp(30px,5vh,58px) 0 clamp(26px,4vh,44px)}
+.lg__cell h4{margin:0 0 12px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.lg__cell p{margin:0 0 6px;font-size:14px;color:var(--soft);line-height:1.6}
+.lg__cell a{color:var(--ink);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .25s}
+.lg__cell a:hover{border-color:var(--sol-accent-lit)}
+.lg__word{position:relative;z-index:1;max-width:1500px;margin:0 auto;padding:0 clamp(24px,4.4vw,64px)}
+.lg__word span{display:block;font-family:var(--font-accent);font-weight:400;font-size:clamp(3rem,15.6vw,15rem);line-height:.78;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1px rgba(240,236,226,.3);padding:clamp(20px,4vh,44px) 0 0;margin-bottom:-.2em;transition:-webkit-text-stroke-color .5s,color .5s}
+.lg__word:hover span{color:rgba(245,233,200,.07);-webkit-text-stroke-color:rgba(245,233,200,.6)}
+.lg__legal{position:relative;z-index:2;max-width:1500px;margin:0 auto;padding:18px clamp(24px,4.4vw,64px) 0;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--faint)}
+.lg__legal a{text-decoration:none}
+.lg__legal a:hover{color:var(--ink)}
+@media (max-width:900px){.lg__rule{background-size:calc(100%/3) 100%}.lg__row{grid-template-columns:1fr auto}.lg__row-desc{display:none}.lg__foot{grid-template-columns:1fr;gap:28px}.lg__head{grid-template-columns:1fr}.lg__meta{text-align:left}}
+
+/* ============================================================
+   03  LIT WINDOWS
+   ============================================================ */
+.lw{position:relative;background:var(--sol-night);padding:clamp(44px,7vh,84px) clamp(24px,4.4vw,64px) clamp(26px,4vh,44px);overflow:hidden}
+.lw__spot{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:0;transition:opacity .5s ease;
+  background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(245,233,200,.10),transparent 70%)}
+.lw:hover .lw__spot{opacity:1}
+.lw__inner{position:relative;z-index:1;max-width:1500px;margin:0 auto}
+.lw__head{display:flex;justify-content:space-between;align-items:flex-end;gap:28px;flex-wrap:wrap;margin-bottom:clamp(26px,4vh,44px)}
+.lw__title{margin:0;font-size:clamp(2rem,4.6vw,4rem);font-weight:500;letter-spacing:-.045em;line-height:.98;max-width:19ch}
+.lw__grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:minmax(126px,auto);gap:12px}
+.lw__cell{position:relative;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;padding:20px;border:1px solid var(--line);border-radius:14px;background:rgba(240,236,226,.02);text-decoration:none;overflow:hidden;transition:border-color .4s,background .4s,transform .4s cubic-bezier(.16,1,.3,1)}
+.lw__cell::after{content:'';position:absolute;inset:0;border-radius:14px;box-shadow:inset 0 1px 0 rgba(245,233,200,.28),inset 0 0 60px rgba(245,233,200,.14);opacity:0;transition:opacity .4s}
+.lw__cell:hover{border-color:rgba(245,233,200,.42);background:rgba(245,233,200,.05);transform:translateY(-3px)}
+.lw__cell:hover::after{opacity:1}
+.lw__cell h4{margin:0;font-size:clamp(1rem,1.5vw,1.3rem);font-weight:500;letter-spacing:-.025em}
+.lw__cell p{margin:0;font-size:12.5px;color:var(--soft);line-height:1.55}
+.lw__cell--wide{grid-column:span 2}
+.lw__cell--photo{padding:0;grid-column:span 2;grid-row:span 2;min-height:280px}
+.lw__cell--photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.8;transition:transform 1.2s cubic-bezier(.16,1,.3,1),opacity .5s}
+.lw__cell--photo:hover img{transform:scale(1.05);opacity:.95}
+.lw__photo-cap{position:relative;z-index:2;margin-top:auto;padding:26px 20px 20px;background:linear-gradient(to top,rgba(5,6,10,.94) 22%,rgba(5,6,10,.62) 62%,transparent)}
+.lw__cell--call{background:var(--sol-accent-lit);border-color:transparent;color:#0d0d0d}
+.lw__cell--call p{color:rgba(13,13,13,.72)}
+.lw__cell--call:hover{background:#fff5dc}
+.lw__cell--call::after{display:none}
+.lw__arrow{position:absolute;top:18px;right:18px;opacity:.4;transition:opacity .3s,transform .4s cubic-bezier(.16,1,.3,1)}
+.lw__cell:hover .lw__arrow{opacity:1;transform:translate(3px,-3px)}
+.lw__base{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:clamp(22px,3.4vh,38px);padding-top:20px;border-top:1px solid var(--line);font-size:12.5px;color:var(--faint)}
+.lw__base a{text-decoration:none}
+.lw__base a:hover{color:var(--ink)}
+@media (max-width:1000px){.lw__grid{grid-template-columns:repeat(2,1fr)}.lw__cell--photo{grid-column:span 2}}
+@media (max-width:600px){.lw__grid{grid-template-columns:1fr}.lw__cell--wide,.lw__cell--photo{grid-column:span 1}}
+
+/* ============================================================
+   04  SPLIT STAGE
+   ============================================================ */
+.sp{position:relative;display:grid;grid-template-columns:1.05fr .95fr;min-height:92vh;background:var(--sol-night)}
+.sp__left{display:flex;flex-direction:column;justify-content:space-between;padding:clamp(40px,6.5vh,80px) clamp(26px,3.6vw,64px)}
+.sp__title{margin:0 0 18px;font-size:clamp(2.2rem,4.2vw,4.2rem);font-weight:500;letter-spacing:-.05em;line-height:.95;max-width:13ch}
+.sp__lede{margin:0 0 clamp(26px,4vh,42px);color:var(--soft);font-size:1rem;line-height:1.62;max-width:44ch}
+.sp__form{display:flex;flex-direction:column;gap:8px;max-width:460px}
+.sp__form label{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink)}
+.sp__field{display:flex;gap:10px}
+.sp__field input{flex:1;height:56px;padding:0 18px;border-radius:11px;border:1px solid rgba(240,236,226,.28);background:rgba(240,236,226,.05);color:var(--ink);font-family:inherit;font-size:15px;outline:none;transition:border-color .25s,background .25s,box-shadow .25s}
+.sp__field input::placeholder{color:rgba(240,236,226,.45)}
+.sp__field input:focus{border-color:var(--sol-accent-lit);background:rgba(245,233,200,.08);box-shadow:0 0 0 3px rgba(245,233,200,.16)}
+.sp__submit{height:56px;padding:0 24px;border:0;border-radius:11px;background:var(--sol-accent-lit);color:#0d0d0d;font-family:inherit;font-size:14.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:transform .2s,filter .2s}
+.sp__submit:hover{transform:translateY(-2px);filter:brightness(1.05)}
+.sp__submit:active{transform:scale(.98)}
+.sp__submit[disabled]{opacity:.6;cursor:default;transform:none}
+.sp__help{font-size:12.5px;color:var(--faint);min-height:18px}
+.sp__help[data-state="done"]{color:var(--sol-accent-lit)}
+.sp__nav{display:grid;grid-template-columns:repeat(4,auto);gap:10px clamp(24px,3vw,56px);justify-content:start;margin-top:clamp(30px,5vh,56px);padding-top:clamp(22px,3vh,34px);border-top:1px solid var(--line)}
+.sp__nav a{font-size:14px;color:var(--soft);text-decoration:none;transition:color .2s}
+.sp__nav a:hover{color:var(--ink)}
+.sp__base{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-top:clamp(24px,4vh,40px);font-size:12.5px;color:var(--faint)}
+.sp__base a{text-decoration:none}
+.sp__base a:hover{color:var(--ink)}
+.sp__right{position:relative;overflow:hidden}
+.sp__right img{position:absolute;inset:-8% 0;width:100%;height:116%;object-fit:cover;will-change:transform}
+.sp__veil{position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,11,12,.95),rgba(11,11,12,.25) 32%,transparent 60%)}
+.sp__card{position:absolute;right:clamp(20px,2.6vw,44px);bottom:clamp(20px,3vh,44px);max-width:330px;padding:22px 24px;border-radius:14px;border:1px solid rgba(240,236,226,.18);background:rgba(9,10,12,.55);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);box-shadow:inset 0 1px 0 rgba(255,255,255,.14)}
+.sp__card p{margin:0 0 12px;font-size:14.5px;line-height:1.5}
+.sp__card small{display:block;font-size:12.5px;color:var(--faint)}
+@media (prefers-reduced-transparency:reduce){.sp__card{background:rgba(9,10,12,.94);backdrop-filter:none;-webkit-backdrop-filter:none}}
+@media (max-width:900px){.sp{grid-template-columns:1fr}.sp__right{min-height:52vh;order:-1}.sp__nav{grid-template-columns:repeat(2,auto)}}
+
+/* ============================================================
+   05  SOLAR DIAL
+   ============================================================ */
+.dl{position:relative;min-height:100vh;background:var(--sol-night-deep);display:grid;place-items:center;padding:clamp(40px,6vh,80px) clamp(24px,4.4vw,64px) clamp(70px,10vh,110px);overflow:hidden}
+.dl__stage{position:relative;width:min(760px,92vw);aspect-ratio:1;display:grid;place-items:center}
+.dl__ring{position:absolute;inset:0;border-radius:50%;border:1px solid var(--line)}
+.dl__ring--2{inset:11%;border-color:rgba(240,236,226,.08)}
+.dl__ring--3{inset:24%;border-color:rgba(240,236,226,.06)}
+.dl__ticks{position:absolute;inset:0;border-radius:50%;animation:dlspin 160s linear infinite}
+.dl__tick{position:absolute;top:-1px;left:50%;width:1px;height:13px;background:rgba(240,236,226,.3)}
+.dl__sun{position:absolute;inset:0;animation:dlspin 44s linear infinite}
+.dl__sun i{position:absolute;top:-9px;left:50%;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:var(--sol-accent-lit)}
+@keyframes dlspin{to{transform:rotate(360deg)}}
+.dl__core{position:relative;z-index:2;text-align:center;max-width:24ch}
+.dl__mark{width:52px;margin:0 auto 20px;color:var(--sol-accent-lit)}
+.dl__title{margin:0 0 14px;font-size:clamp(1.9rem,4vw,3.4rem);font-weight:500;letter-spacing:-.045em;line-height:.98}
+.dl__lede{margin:0 0 26px;color:var(--soft);font-size:.98rem;line-height:1.6;max-width:30ch;margin-left:auto;margin-right:auto}
+.dl__cta{display:inline-flex;align-items:center;gap:12px;height:52px;padding:0 26px;border-radius:999px;background:var(--sol-accent-lit);color:#0d0d0d;text-decoration:none;font-size:14.5px;font-weight:600;transition:transform .25s cubic-bezier(.16,1,.3,1),filter .25s}
+.dl__cta:hover{transform:translateY(-2px);filter:brightness(1.05)}
+.dl__orbit{position:absolute;inset:0;pointer-events:none}
+.dl__node{position:absolute;top:50%;left:50%;pointer-events:auto;font-size:14px;color:var(--soft);text-decoration:none;white-space:nowrap;transition:color .25s,letter-spacing .35s}
+.dl__node:hover{color:var(--sol-accent-lit);letter-spacing:.03em}
+.dl__base{position:absolute;left:0;right:0;bottom:0;padding:0 clamp(24px,4.4vw,64px) clamp(20px,3vh,34px);display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--faint)}
+.dl__base a{text-decoration:none}
+.dl__base a:hover{color:var(--ink)}
+.dl__contacts{display:flex;gap:clamp(18px,3vw,44px)}
+.dl__contacts a{color:var(--soft);text-decoration:none}
+.dl__contacts a:hover{color:var(--ink)}
+@media (max-width:760px){
+  .dl__orbit{position:static;display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:30px;width:100%}
+  .dl__node{position:static;transform:none!important;text-align:center}
+  .dl__stage{aspect-ratio:auto;width:100%;padding:20px 0 40px}
+  .dl__ring,.dl__ticks,.dl__sun{display:none}
+  .dl__base{position:static;justify-content:flex-start;flex-direction:column;align-items:flex-start;padding:24px 0 0}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  .hz__type i{transform:none}
+  .hz__sun{transform:translate(-50%,44%);opacity:1}
+  .hz__horizon{transform:scaleX(1)}
+}
+</style>
+</head>
+<body>
+
+<header class="lab-top">
+  <h1>Five footers for Solstice</h1>
+  <p>Each one is a complete, working footer in the page's own palette, type and night imagery. Scroll through, hover everything, then tell me the number you want and I will build it as a real component wired into the closing push.</p>
+  <ul class="lab-jump">
+    <li><a href="#f1"><b>01</b> Horizon</a></li>
+    <li><a href="#f2"><b>02</b> Ledger</a></li>
+    <li><a href="#f3"><b>03</b> Lit Windows</a></li>
+    <li><a href="#f4"><b>04</b> Split Stage</a></li>
+    <li><a href="#f5"><b>05</b> Solar Dial</a></li>
+  </ul>
+</header>
+
+<!-- ============================================================
+     01  HORIZON
+     ============================================================ -->
+<section class="slab" id="f1">
+  <div class="slab-head">
+    <span class="slab-num">01</span>
+    <div>
+      <h2 class="slab-name">Horizon</h2>
+      <p class="slab-note">The page is a day passing, so the footer is the sun coming back. A light disc rises from below the bottom edge as the footer lands, a hairline horizon draws itself across the frame, and the closing line lifts through it in two masked bands. <b>Quietest of the five, and the most native to the story the page already tells.</b></p>
+    </div>
+  </div>
+  <div class="stage">
+    <footer class="hz" data-hz>
+      <div class="hz__sun"></div>
+      <div class="hz__horizon"></div>
+
+      <div class="hz__inner">
+        <h2 class="hz__type">
+          <span><i>Clean energy</i></span>
+          <span><i>that <em>works</em></i></span>
+        </h2>
+
+        <div class="hz__grid">
+          <div class="hz__col">
+            <p class="hz__lede">Design, install and monitoring for homes across Karakalpakstan. One team from the survey to the switch on.</p>
+          </div>
+          <div class="hz__col">
+            <a class="hz__link" href="#">Benefits</a>
+            <a class="hz__link" href="#">Product</a>
+            <a class="hz__link" href="#">How It Works</a>
+            <a class="hz__link" href="#">Our Cases</a>
+          </div>
+          <div class="hz__col">
+            <a class="hz__link" href="#">Reviews</a>
+            <a class="hz__link" href="#">Careers</a>
+            <a class="hz__link" href="mailto:contact@solstice.energy">contact@solstice.energy</a>
+            <a class="hz__link" href="tel:+998612248372">+998 (61) 224-8372</a>
+          </div>
+          <a class="hz__cta" href="#">
+            Book a survey
+            <i aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </i>
+          </a>
+        </div>
+
+        <div class="hz__base">
+          <span>Nukus, Karakalpakstan</span>
+          <span>&copy; 2026 Solstice Energy</span>
+          <span><a href="#">Privacy</a> &nbsp; <a href="#">Terms</a></span>
+        </div>
+      </div>
+    </footer>
+  </div>
+</section>
+
+<!-- ============================================================
+     02  LEDGER
+     ============================================================ -->
+<section class="slab" id="f2">
+  <div class="slab-head">
+    <span class="slab-num">02</span>
+    <div>
+      <h2 class="slab-name">Ledger</h2>
+      <p class="slab-note">Engineering-precise. A six-column hairline grid runs the full height, navigation becomes large index rows that step inward on hover while a small photograph tracks the cursor, and the wordmark sits at the base as outlined type that fills with light when you touch it. <b>Best if you want the footer to read as competence rather than atmosphere.</b></p>
+    </div>
+  </div>
+  <div class="stage">
+    <footer class="lg" data-lg>
+      <div class="lg__rule" aria-hidden="true"></div>
+
+      <div class="lg__inner">
+        <div class="lg__head">
+          <h2 class="lg__title">Sunlight is the cheapest thing on your roof.</h2>
+          <div class="lg__meta">
+            Installing since 2019<br />
+            Nukus, Karakalpakstan
+          </div>
+        </div>
+
+        <nav class="lg__rows" aria-label="Footer">
+          <a class="lg__row" href="#" data-peek="/images/solar-house-day.png">
+            <span class="lg__row-name">Product</span>
+            <span class="lg__row-desc">Panels, inverter, controller</span>
+            <span class="lg__row-go">Open</span>
+          </a>
+          <a class="lg__row" href="#" data-peek="/images/solar-capture-day.png">
+            <span class="lg__row-name">How It Works</span>
+            <span class="lg__row-desc">Survey to switch on in four weeks</span>
+            <span class="lg__row-go">Open</span>
+          </a>
+          <a class="lg__row" href="#" data-peek="/images/solar-house-night.png">
+            <span class="lg__row-name">Our Cases</span>
+            <span class="lg__row-desc">Homes we have already lit</span>
+            <span class="lg__row-go">Open</span>
+          </a>
+          <a class="lg__row" href="#" data-peek="/images/smart-controller.png">
+            <span class="lg__row-name">Reviews</span>
+            <span class="lg__row-desc">What owners say after a winter</span>
+            <span class="lg__row-go">Open</span>
+          </a>
+          <a class="lg__row" href="#" data-peek="/images/solar-home-night.png">
+            <span class="lg__row-name">Book a survey</span>
+            <span class="lg__row-desc">Free, on site, no obligation</span>
+            <span class="lg__row-go">Open</span>
+          </a>
+        </nav>
+
+        <div class="lg__foot">
+          <div class="lg__cell">
+            <h4>Talk to us</h4>
+            <p><a href="mailto:contact@solstice.energy">contact@solstice.energy</a></p>
+            <p><a href="tel:+998612248372">+998 (61) 224-8372</a></p>
+          </div>
+          <div class="lg__cell">
+            <h4>Office</h4>
+            <p>28 Dosnazarov Street<br />Nukus, Karakalpakstan</p>
+          </div>
+          <div class="lg__cell">
+            <h4>Company</h4>
+            <p><a href="#">Careers</a></p>
+            <p><a href="#">Warranty and service</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg__legal">
+        <span>&copy; 2026 Solstice Energy</span>
+        <span><a href="#">Privacy</a> &nbsp; <a href="#">Terms</a></span>
+      </div>
+
+      <!-- Cropped by the footer's own bottom edge on purpose. A wordmark that
+           fits inside the frame is a logo; one that does not is a building. -->
+      <div class="lg__word" aria-hidden="true"><span>Solstice</span></div>
+
+      <div class="lg__peek" data-peek-el aria-hidden="true"><img alt="" src="/images/solar-house-day.png" data-peek-img /></div>
+    </footer>
+  </div>
+</section>
+
+<!-- ============================================================
+     03  LIT WINDOWS
+     ============================================================ -->
+<section class="slab" id="f3">
+  <div class="slab-head">
+    <span class="slab-num">03</span>
+    <div>
+      <h2 class="slab-name">Lit Windows</h2>
+      <p class="slab-note">The footer as a house after dark. Every destination is a window in an asymmetric grid, and each one switches on from the inside when you reach it, with a soft pool of light following the cursor across the whole wall. <b>The most interactive of the five, and the one that gives every link somewhere real to breathe.</b></p>
+    </div>
+  </div>
+  <div class="stage">
+    <footer class="lw" data-lw>
+      <div class="lw__spot" aria-hidden="true"></div>
+
+      <div class="lw__inner">
+        <div class="lw__head">
+          <h2 class="lw__title">The lights stay on after the sun goes down.</h2>
+          <a class="hz__cta" href="#">
+            Book a survey
+            <i aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </i>
+          </a>
+        </div>
+
+        <div class="lw__grid">
+          <a class="lw__cell lw__cell--photo" href="#">
+            <img src="/images/solar-house-night.png" alt="A house running on its own stored sunlight after dark" />
+            <span class="lw__photo-cap">
+              <h4>Our Cases</h4>
+              <p>Forty-one homes across the region.</p>
+            </span>
+          </a>
+
+          <a class="lw__cell" href="#">
+            <svg class="lw__arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+            <h4>Product</h4>
+            <p>Panels, inverter, controller.</p>
+          </a>
+
+          <a class="lw__cell" href="#">
+            <svg class="lw__arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+            <h4>Benefits</h4>
+            <p>What it does to a winter bill.</p>
+          </a>
+
+          <a class="lw__cell lw__cell--wide" href="#">
+            <svg class="lw__arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+            <h4>How It Works</h4>
+            <p>Survey, design, install, switch on. Four weeks from the first visit.</p>
+          </a>
+
+          <a class="lw__cell" href="#">
+            <svg class="lw__arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+            <h4>Reviews</h4>
+            <p>Owners, one winter later.</p>
+          </a>
+
+          <a class="lw__cell" href="#">
+            <svg class="lw__arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+            <h4>Careers</h4>
+            <p>Three roles on the install crew.</p>
+          </a>
+
+          <a class="lw__cell lw__cell--call lw__cell--wide" href="mailto:contact@solstice.energy">
+            <h4>contact@solstice.energy</h4>
+            <p>+998 (61) 224-8372</p>
+          </a>
+        </div>
+
+        <div class="lw__base">
+          <span>Nukus, Karakalpakstan</span>
+          <span>&copy; 2026 Solstice Energy</span>
+          <span><a href="#">Privacy</a> &nbsp; <a href="#">Terms</a></span>
+        </div>
+      </div>
+    </footer>
+  </div>
+</section>
+
+<!-- ============================================================
+     04  SPLIT STAGE
+     ============================================================ -->
+<section class="slab" id="f4">
+  <div class="slab-head">
+    <span class="slab-num">04</span>
+    <div>
+      <h2 class="slab-name">Split Stage</h2>
+      <p class="slab-note">Half the frame is the ask, half is the night photograph, drifting slowly against the scroll. The survey request lives right here as a single field, so the last thing on the page is a thing you can actually do. <b>The commercial choice. Pick this if the footer has to earn leads, not just close the story.</b></p>
+    </div>
+  </div>
+  <div class="stage">
+    <footer class="sp" data-sp>
+      <div class="sp__left">
+        <div>
+          <h2 class="sp__title">Find out what your roof is worth.</h2>
+          <p class="sp__lede">Tell us where the house is. A surveyor comes out, measures the roof and sends back a real number, not an estimate from a map.</p>
+
+          <form class="sp__form" data-sp-form>
+            <label for="sp-addr">Where is the house</label>
+            <div class="sp__field">
+              <input id="sp-addr" name="address" type="text" placeholder="Street and city" autocomplete="street-address" required />
+              <button class="sp__submit" type="submit">Book a survey</button>
+            </div>
+            <p class="sp__help" data-sp-help>Free, on site, and no obligation after it.</p>
+          </form>
+
+          <nav class="sp__nav" aria-label="Footer">
+            <a href="#">Benefits</a>
+            <a href="#">Product</a>
+            <a href="#">How It Works</a>
+            <a href="#">Our Cases</a>
+            <a href="#">Reviews</a>
+            <a href="#">Careers</a>
+            <a href="mailto:contact@solstice.energy">contact@solstice.energy</a>
+            <a href="tel:+998612248372">+998 (61) 224-8372</a>
+          </nav>
+        </div>
+
+        <div class="sp__base">
+          <span>Nukus, Karakalpakstan</span>
+          <span>&copy; 2026 Solstice Energy</span>
+          <span><a href="#">Privacy</a> &nbsp; <a href="#">Terms</a></span>
+        </div>
+      </div>
+
+      <div class="sp__right">
+        <img src="/images/solar-home-night.png" alt="A solar equipped home lit from inside at night" data-sp-img />
+        <div class="sp__veil" aria-hidden="true"></div>
+        <div class="sp__card">
+          <p>The panels paid for the winter they were supposed to survive.</p>
+          <small>Gulnara Yusupova, Nukus</small>
+        </div>
+      </div>
+    </footer>
+  </div>
+</section>
+
+<!-- ============================================================
+     05  SOLAR DIAL
+     ============================================================ -->
+<section class="slab" id="f5">
+  <div class="slab-head">
+    <span class="slab-num">05</span>
+    <div>
+      <h2 class="slab-name">Solar Dial</h2>
+      <p class="slab-note">The brand mark taken literally. Navigation sits on the arc of a slow instrument dial, a single light travels its rim, and everything else is stripped back to one sentence at the centre. <b>The experimental one. Biggest personality, and the biggest departure from anything above it on the page.</b></p>
+    </div>
+  </div>
+  <div class="stage">
+    <footer class="dl" data-dl>
+      <div class="dl__stage">
+        <div class="dl__ring" aria-hidden="true"></div>
+        <div class="dl__ring dl__ring--2" aria-hidden="true"></div>
+        <div class="dl__ring dl__ring--3" aria-hidden="true"></div>
+        <div class="dl__ticks" aria-hidden="true" data-dl-ticks></div>
+        <div class="dl__sun" aria-hidden="true"><i></i></div>
+
+        <nav class="dl__orbit" aria-label="Footer" data-dl-orbit>
+          <a class="dl__node" href="#">Benefits</a>
+          <a class="dl__node" href="#">Product</a>
+          <a class="dl__node" href="#">How It Works</a>
+          <a class="dl__node" href="#">Our Cases</a>
+          <a class="dl__node" href="#">Reviews</a>
+          <a class="dl__node" href="#">Careers</a>
+        </nav>
+
+        <div class="dl__core">
+          <svg class="dl__mark" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">
+            <circle cx="50" cy="50" r="18.5"/>
+            <g data-dl-rays></g>
+          </svg>
+          <h2 class="dl__title">Clean energy that works</h2>
+          <p class="dl__lede">Residential solar for Karakalpakstan, from the first survey to the night the lights stay on.</p>
+          <a class="dl__cta" href="#">Book a survey</a>
+        </div>
+      </div>
+
+      <div class="dl__base">
+        <span>Nukus, Karakalpakstan &nbsp; &copy; 2026 Solstice Energy</span>
+        <span class="dl__contacts">
+          <a href="mailto:contact@solstice.energy">contact@solstice.energy</a>
+          <a href="tel:+998612248372">+998 (61) 224-8372</a>
+        </span>
+        <span><a href="#">Privacy</a> &nbsp; <a href="#">Terms</a></span>
+      </div>
+    </footer>
+  </div>
+</section>
+
+<script>
+const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ?only=3 strips the lab away and leaves one footer alone on a black page,
+   which is the only honest way to judge one of these. It is also what the
+   screenshots are taken through. */
+(function () {
+  const only = new URLSearchParams(location.search).get('only');
+  if (!only) return;
+  document.querySelector('.lab-top').remove();
+  document.querySelectorAll('.slab').forEach((s) => {
+    if (s.id !== 'f' + only) s.remove();
+    else s.querySelector('.slab-head').remove();
+  });
+})();
+
+/* 01  Horizon: the rise is keyed to the footer actually being on screen,
+   which is what the real component will do too since it sits inside a pinned
+   stage where there is no stable scroll position to read. */
+(function () {
+  const hz = document.querySelector('[data-hz]');
+  if (!hz) return;
+  if (REDUCED) { hz.classList.add('is-up'); return; }
+  const io = new IntersectionObserver(
+    ([e]) => hz.classList.toggle('is-up', e.intersectionRatio >= 0.35),
+    { threshold: [0, 0.35] }
+  );
+  io.observe(hz);
+})();
+
+/* 02  Ledger: one shared peek element follows the pointer. Transform only,
+   written straight to style so nothing re-lays-out per frame. */
+(function () {
+  const root = document.querySelector('[data-lg]');
+  if (!root || REDUCED) return;
+  const peek = root.querySelector('[data-peek-el]');
+  const img = root.querySelector('[data-peek-img]');
+  let raf = 0, x = 0, y = 0;
+
+  const draw = () => {
+    raf = 0;
+    peek.style.transform = 'translate(' + x + 'px,' + y + 'px) translate(-50%,-50%) scale(' + (peek.classList.contains('is-on') ? 1 : 0.94) + ')';
+  };
+
+  root.querySelectorAll('[data-peek]').forEach((row) => {
+    row.addEventListener('pointerenter', () => {
+      img.src = row.dataset.peek;
+      peek.classList.add('is-on');
+    });
+    row.addEventListener('pointerleave', () => peek.classList.remove('is-on'));
+  });
+
+  root.addEventListener('pointermove', (e) => {
+    x = e.clientX + 150; y = e.clientY;
+    if (!raf) raf = requestAnimationFrame(draw);
+  });
+})();
+
+/* 03  Lit Windows: the pool of light is two custom properties, so the paint
+   stays on the compositor and no element is measured. */
+(function () {
+  const lw = document.querySelector('[data-lw]');
+  if (!lw || REDUCED) return;
+  let raf = 0, mx = '50%', my = '50%';
+  const draw = () => { raf = 0; lw.style.setProperty('--mx', mx); lw.style.setProperty('--my', my); };
+  lw.addEventListener('pointermove', (e) => {
+    const r = lw.getBoundingClientRect();
+    mx = (e.clientX - r.left) + 'px'; my = (e.clientY - r.top) + 'px';
+    if (!raf) raf = requestAnimationFrame(draw);
+  });
+})();
+
+/* 04  Split Stage: photograph drifts against the scroll, plus the three real
+   states of the field. */
+(function () {
+  const sp = document.querySelector('[data-sp]');
+  if (!sp) return;
+
+  const img = sp.querySelector('[data-sp-img]');
+  if (img && !REDUCED && 'IntersectionObserver' in window) {
+    let ticking = false;
+    const shift = () => {
+      ticking = false;
+      const r = sp.getBoundingClientRect();
+      const p = Math.max(-1, Math.min(1, (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight));
+      img.style.transform = 'translate3d(0,' + (p * -34) + 'px,0)';
+    };
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { sp.dataset.live = ''; } else { delete sp.dataset.live; }
+    });
+    io.observe(sp);
+    /* Scroll-driven CSS would be the shipping version. In React this becomes
+       a useScroll motion value, never a scroll listener on window. */
+    document.addEventListener('scroll', () => { if (!ticking && 'live' in sp.dataset) { ticking = true; requestAnimationFrame(shift); } }, { passive: true });
+    shift();
+  }
+
+  const form = sp.querySelector('[data-sp-form]');
+  const help = sp.querySelector('[data-sp-help]');
+  const btn = form.querySelector('.sp__submit');
+  const idle = help.textContent;
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const value = form.address.value.trim();
+    if (!value) {
+      help.dataset.state = 'error';
+      help.style.color = '#d98a63';
+      help.textContent = 'We need the address before we can send anyone out.';
+      form.address.focus();
+      return;
+    }
+    btn.disabled = true; btn.textContent = 'Sending';
+    help.style.color = ''; help.dataset.state = '';
+    help.textContent = idle;
+    setTimeout(() => {
+      btn.textContent = 'Booked';
+      help.dataset.state = 'done';
+      help.textContent = 'Got it. A surveyor will call within one working day.';
+    }, 900);
+  });
+})();
+
+/* 05  Solar Dial: ticks, rays and the orbit are placed once at mount rather
+   than written out by hand. */
+(function () {
+  const dl = document.querySelector('[data-dl]');
+  if (!dl) return;
+
+  const ticks = dl.querySelector('[data-dl-ticks]');
+  for (let i = 0; i < 60; i++) {
+    const t = document.createElement('span');
+    t.className = 'dl__tick';
+    t.style.transform = 'rotate(' + (i * 6) + 'deg)';
+    t.style.transformOrigin = '50% calc(50vmin)';
+    ticks.appendChild(t);
+  }
+  /* transform-origin has to be the ring radius, which is only known once the
+     stage has a width. */
+  const sizeTicks = () => {
+    const r = ticks.getBoundingClientRect().width / 2;
+    ticks.querySelectorAll('.dl__tick').forEach((t, i) => {
+      t.style.transformOrigin = '50% ' + r + 'px';
+      t.style.transform = 'rotate(' + (i * 6) + 'deg)';
+    });
+  };
+
+  const rays = dl.querySelector('[data-dl-rays]');
+  [0, 45, 90, 135, 180, 225, 270, 315].forEach((a) => {
+    const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    r.setAttribute('x', '43.5'); r.setAttribute('y', '2');
+    r.setAttribute('width', '13'); r.setAttribute('height', '26');
+    r.setAttribute('rx', '6.5');
+    r.setAttribute('transform', 'rotate(' + a + ' 50 50)');
+    rays.appendChild(r);
+  });
+
+  const orbit = dl.querySelector('[data-dl-orbit]');
+  const nodes = [...orbit.querySelectorAll('.dl__node')];
+  const place = () => {
+    if (window.innerWidth <= 760) { nodes.forEach((n) => (n.style.transform = '')); return; }
+    const r = orbit.getBoundingClientRect().width / 2 - 26;
+    nodes.forEach((n, i) => {
+      /* Spread across the lower two thirds of the dial so the arc never
+         collides with the sentence at the centre. */
+      const a = (-150 + (i * 300) / (nodes.length - 1)) * (Math.PI / 180);
+      n.style.transform = 'translate(-50%,-50%) translate(' + Math.sin(a) * r + 'px,' + -Math.cos(a) * r + 'px)';
+    });
+  };
+
+  const relayout = () => { sizeTicks(); place(); };
+  relayout();
+  window.addEventListener('resize', relayout, { passive: true });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(relayout);
+})();
+</script>
+</body>
+</html>

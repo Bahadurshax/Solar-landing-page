@@ -1,0 +1,413 @@
+/* ============================================================
+   Testimonials — two rows, running against each other
+   ============================================================
+
+   Warm white, and the page's one bright breath at the end. About finishes
+   after dark and the footer is night again, so this section is the light
+   between them — the same cream ground Our Cases stands on, which is why a
+   light band this late still reads as the same site rather than as a section
+   from somewhere else.
+
+   Two rows, crossing the frame, on an open field. There is no heading, no lede
+   and no imagery beyond the ground: the whole section is the wall, and
+   everything that is not a quote has been taken out of its way.
+
+   The file is in two halves. Everything down to the divider is the wall. Below
+   it is the static layout, which is not a fallback in the apologetic sense —
+   it is what the section is wherever a moving band cannot be stopped. See the
+   note there, and MARQUEE_OK in breakpoints.js. */
+
+.testimonials {
+  --t-bg: var(--page-ground);
+  --t-surface: var(--page-paper);
+
+  /* The ink is held back rather than tinted away. Ten quotes at display size
+     in full-strength ink is a very loud wall; pulling the copy back lets the
+     section read as quiet without going so pale that it stops passing
+     contrast. All three clear AA on the card surface — roughly 6.4:1, 9.6:1
+     and 4.5:1 — which is the floor these can be taken to, not a value to
+     soften further. Alpha over the page's own ink rather than a grey ramp,
+     because a true grey is the one thing this palette does not have. */
+  --t-ink: rgba(11, 11, 12, 0.66);
+  --t-ink-strong: var(--sol-ink);
+  --t-ink-faint: rgba(11, 11, 12, 0.44);
+  --t-line: rgba(11, 11, 12, 0.14);
+  --t-gold: var(--sol-accent);
+
+  /* One number for the rhythm along a row, and the same number between the two
+     of them. A lap travels exactly one group's width, and a group is only
+     exactly that if the space after its last card matches the space between
+     cards — hence the trailing padding on the group as well as the gap inside
+     it. Change this and the loop stays seamless; change one of the two and it
+     tears once per lap. */
+  --t-gap: 26px;
+
+  /* A card's width, and the only real decision the horizontal layout adds.
+     Wide enough that a quote of eighty-odd characters sets in three lines
+     rather than five, narrow enough that four of them are on the glass at
+     once — a row showing two cards at a time is a slideshow, not a wall. */
+  --t-card: clamp(264px, 21vw, 344px);
+
+  /* How far in from each edge a card is still being read through. A width
+     rather than a percentage: the fade is a distance the eye covers, and at
+     15% of the frame a wide monitor would swallow the better part of a card at
+     each end while a laptop barely blurred one. */
+  --t-fade: clamp(64px, 9vw, 190px);
+
+  position: relative;
+  /* Its own screen, named rather than inherited. This section is an ordinary
+     one in the flow — nothing above it clips it to a stage — so a percentage
+     height would resolve against an auto-height parent and collapse the wall
+     onto its two rows. dvh for the usual reason on a phone. */
+  min-height: 100dvh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  /* No inset. The rows are meant to run out of the frame and the edge veil is
+     what ends them; a margin as well would put a hard edge just outside a soft
+     one and read as a list in a box, which is the thing the fade exists to
+     avoid. */
+  padding: 0;
+  /* Under the photograph, and only ever seen before it decodes. */
+  background: var(--t-bg);
+  color: var(--t-ink);
+  font-family: var(--font-body);
+}
+
+/* ------------------------------------------------------------
+   The ground
+   ------------------------------------------------------------
+
+   An aerial of an array with the fields either side of it. It is the only
+   photograph on the page taken from above, which is the argument for it being
+   here: every other image is at eye level outside a house, and this section is
+   the one that steps back and looks at the whole thing at once. */
+
+.testimonials__plate {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* The photograph at full strength — nothing veiling it and no colour touched.
+   The cards carry their own opaque surface, so the quotes keep their contrast
+   against the card rather than against whatever is behind the section. */
+.testimonials__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Framed high. The bottom two thirds of this photograph are two large flat
+     fields; pulling the array, the treeline and the railway into the frame
+     keeps something to look at behind the rows. */
+  object-position: 50% 24%;
+}
+
+/* The fade the rows run out through: the same photograph as the plate, laid
+   over the wall and masked to show only at the two edges.
+
+   A veil rather than a mask on the wall itself, and the difference is the
+   whole reason this element exists. A masked element cannot hand its subtree
+   to the compositor, so a mask on .testimonials__wall would put both rows back
+   on the main thread to repaint every frame — at the same time as the entrance
+   scrub is rescaling that same masked subtree. Here there is nothing animating
+   inside the mask at all, and what the eye gets is identical, because the thing
+   revealed behind a fading card was always this photograph.
+
+   Kept in register with the plate by the scrub, which scales both [data-plate]
+   elements together. */
+.testimonials__edges {
+  position: absolute;
+  inset: 0;
+  /* Above the wall, which is 1. */
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0,
+    transparent var(--t-fade),
+    transparent calc(100% - var(--t-fade)),
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000 0,
+    transparent var(--t-fade),
+    transparent calc(100% - var(--t-fade)),
+    #000 100%
+  );
+}
+
+/* ------------------------------------------------------------
+   The wall
+   ------------------------------------------------------------ */
+
+.testimonials__wall {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--t-gap);
+
+  /* Paint room inside the clip. A hovered card grows and lifts, and whichever
+     way the wall clips it is sliced on a square corner the moment it does. The
+     block edges are the only ones available to pad — a row is wider than the
+     frame by definition, so there is nothing to give it on the inline sides.
+     Deep enough for the lift, the few pixels of growth, and the shadow. */
+  --t-bleed: 24px;
+
+  width: 100%;
+  padding-block: var(--t-bleed);
+  /* Content height, not the frame's. Two rows floating in the middle of the
+     aerial with open ground above and below them is the section. */
+  height: auto;
+  /* Horizontal, in effect: the rows run several screens wider than this box
+     and have to be cut off. The block cut is the accident the bleed pays for. */
+  overflow: hidden;
+  transform-origin: 50% 50%;
+}
+
+/* The hit area for the brake, and nothing else. It is a separate element from
+   the track because the track is the thing that moves: a pointer target that
+   slides several screens sideways under the cursor is not a pointer target.
+   This one is the width of the frame and holds still. */
+.t-row {
+  position: relative;
+}
+
+/* The moving element. Its transform is owned by GSAP — nothing here animates,
+   and there are no keyframes in this file at all. That is deliberate: the
+   speed has to be tweenable so the row can brake under the pointer instead of
+   stopping dead, and `animation-play-state` has exactly two settings. */
+.t-row__track {
+  display: flex;
+  /* Sized to its own contents rather than to the frame, and the loop depends
+     on it. As a flex child this would otherwise be stretched to the wall's
+     width, and xPercent is a percentage of *this* element — stretched, one lap
+     would be half a screen instead of half its contents, and the seam would
+     tear open every time round. */
+  width: max-content;
+  /* Stops the seam shimmering as the group boundary crosses a subpixel. It
+     does not promote the row — the running transform does that on its own. */
+  backface-visibility: hidden;
+}
+
+.t-row__group {
+  display: flex;
+  /* Never squeezed. Two groups of five fixed-width cards are far wider than
+     the frame, and flex would happily solve that overflow by shrinking every
+     card until the row fit — which is exactly the layout this is not. */
+  flex: none;
+  gap: var(--t-gap);
+
+  /* A stacking context, and it is here for the compositor rather than for the
+     paint order.
+
+     The cards are positioned (see .t-card, which needs somewhere to raise a
+     hovered card to). Positioned descendants paint in a later phase than
+     in-flow content, and with no stacking context between them and the
+     animating track, Chrome cannot paint them into the track's own composited
+     layer — it pulls them into a squashing layer instead, one per row, sitting
+     outside the layer that actually animates. The track then translates on the
+     compositor for free while every card in it is re-rastered on the way past,
+     which is the one thing promoting the track was supposed to buy.
+
+     Containing the positioned cards here is what lets each row be a single
+     layer with its cards inside it, and it costs nothing visually: the groups
+     never overlap each other, so a card raised on hover still rises above its
+     neighbours exactly as before. */
+  position: relative;
+  z-index: 0;
+
+  /* Not a decorative margin. It gives the group the same trailing space it has
+     between its own cards, so one group's width is exactly one lap and the
+     loop has no seam. Paired with --t-gap above. */
+  padding-right: var(--t-gap);
+}
+
+/* ------------------------------------------------------------
+   A card
+   ------------------------------------------------------------ */
+
+.t-card {
+  /* Positioned so the hover state has a z-index to raise. Set here rather than
+     in :hover so nothing about the card's own stacking changes at the moment
+     the pointer arrives. */
+  position: relative;
+  /* One width for every card, and no shrinking to fit — see the group. */
+  flex: none;
+  width: var(--t-card);
+  /* A row stretches every card to the height of the tallest quote in it, so
+     the cards line up top and bottom whatever their sentence does. That only
+     reads as deliberate if the attributions line up as well, which is what the
+     column and the auto margin below are for: the name sits on the floor of
+     the card rather than hanging under a short line. */
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: clamp(22px, 2vw, 32px) clamp(22px, 2vw, 32px) clamp(18px, 1.7vw, 26px);
+  border-radius: 16px;
+  border: 1px solid var(--t-line);
+  background: var(--t-surface);
+  /* Tinted to the ground rather than black. A neutral shadow on a warm field
+     turns the gap under every card grey. */
+  box-shadow: 0 12px 24px -18px rgba(96, 74, 38, 0.5);
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Comes forward as well as up. The row it sits in is already braking by the
+   time this is seen, so the growth reads as the card stepping out of a
+   slowing wall rather than as something swelling while it races past.
+
+   1.035 and no more. The gap between cards is 26px and a card is 264–344px
+   wide, so this reaches about six pixels into that gap on each side — clear of
+   its neighbour. Anything nearer 1.09 closes the gap and the cards collide.
+
+   Raised while it does: the scaled card and its deeper shadow overlap the
+   cards either side of it, and in source order it would otherwise be painted
+   under whichever of them comes later. */
+.t-card:hover {
+  z-index: 2;
+  border-color: rgba(176, 138, 83, 0.5);
+  box-shadow: 0 16px 32px -18px rgba(96, 74, 38, 0.55);
+  transform: translateY(-3px) scale(1.035);
+}
+
+.t-card__quote {
+  /* The gap down to the attribution lives here rather than on the rule below,
+     because that margin has the other job of pushing the attribution to the
+     floor of a stretched card. Same distance to the hairline either way. */
+  margin: 0 0 18px;
+  font-family: var(--font-display);
+  font-size: clamp(18px, 1.45vw, 22px);
+  font-weight: calc(400 + var(--display-weight-delta));
+  line-height: 1.34;
+  letter-spacing: calc(var(--track-title) + var(--display-tracking-delta));
+  color: var(--t-ink);
+  text-wrap: pretty;
+}
+
+.t-card__who {
+  /* The floor of the card. Every card in a row is as tall as the longest quote
+     in it, and without this the short ones would carry their name halfway up
+     an otherwise empty card. Collapses to nothing where the card is not
+     stretched — which is the static layout, below. */
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--t-line);
+}
+
+.t-card__name {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--t-ink-strong);
+}
+
+.t-card__meta {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--t-ink-faint);
+}
+
+.t-card__dot {
+  padding: 0 8px;
+  color: var(--t-gold);
+}
+
+/* ============================================================
+   Where the wall cannot be a wall
+   ============================================================
+
+   No travel, no clip, no screen-height stage: the quotes become a grid that
+   ends where it ends.
+
+   Three conditions, and the width is only one of them. A marquee's entire
+   defence is that the reader can stop it, so without a pointer to stop it with
+   there is no defence — a coarse pointer gets the grid at any width, not just
+   a narrow one. A narrow viewport gets it because a row holds two cards at a
+   time there and takes the sentence away mid-read. And reduced motion gets it
+   because that is what the preference asks for.
+
+   This mirrors MARQUEE_OK in breakpoints.js, negated: the wall runs only where
+   all three hold, so the static layout is the comma-joined complement. Change
+   the width in one place and there are two others to change — the query below
+   and the one in partners.css.
+
+   The entrance zoom is gated on the same condition in TestimonialsSection, so
+   there is no case where a static grid is being scrubbed. */
+
+@media (max-width: 900px), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .testimonials {
+    display: block;
+    min-height: 0;
+    overflow: visible;
+    padding: clamp(72px, 12vw, 120px) clamp(20px, 5vw, 56px);
+  }
+
+  /* Nothing to fade out of. The rows end at the grid's edge, not past it. */
+  .testimonials__edges {
+    display: none;
+  }
+
+  /* One grid for all ten quotes, and it is the wall that carries it rather
+     than either row. Everything between here and a card — the row, its track,
+     its group — is dissolved with `display: contents`, so the cards become
+     items of this grid directly.
+
+     That is the whole point rather than a tidiness: with the grid on each row
+     instead, five cards in an even number of columns leave the last one
+     standing alone beside an empty cell, and the reader gets a hole punched
+     through the middle of the section where the two rows meet. Ten quotes in
+     one field has no such seam, because there is no join to show.
+
+     auto-fill rather than a column count per breakpoint. This layout runs
+     everywhere from a 360px phone to a 1440px tablet in landscape, and a rule
+     per band of that range is three rules that can disagree. */
+  .testimonials__wall {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: var(--t-gap);
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0;
+    overflow: visible;
+    transform: none;
+  }
+
+  .t-row,
+  .t-row__track,
+  .t-row__group {
+    display: contents;
+  }
+
+  /* The duplicate group exists to make a loop seamless. With no loop it is the
+     same five quotes printed twice. Removed rather than dissolved, and after
+     the rule above so it wins. */
+  .t-row__group[aria-hidden='true'] {
+    display: none;
+  }
+
+  /* Ordinary boxes again: the width of a grid column, and the auto margin on
+     the attribution resolving against the row height the grid gives them. */
+  .t-card {
+    width: auto;
+  }
+
+  /* Nothing is going past, so there is nothing to catch. A card that grows
+     under the pointer in a static grid is decoration, and it would push its
+     neighbours' shadows around for no reason. */
+  .t-card:hover {
+    transform: none;
+  }
+}

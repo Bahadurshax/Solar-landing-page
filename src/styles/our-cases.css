@@ -1,0 +1,1054 @@
+/* ============================================================
+   Our Cases — editorial region-map case studies
+   ============================================================ */
+
+.our-cases {
+  --ink: var(--sol-ink);
+  --ink-soft: rgba(11, 11, 12, 0.72);
+  --ink-muted: rgba(11, 11, 12, 0.62);
+  --gold: var(--sol-accent);
+  --gold-line: rgba(138, 122, 78, 0.26);
+  --gold-line-strong: rgba(138, 122, 78, 0.5);
+  --route: rgba(138, 122, 78, 0.5);
+  --surface: var(--page-paper);
+  --surface-quiet: var(--sol-paper);
+  /* Tinted from the ink rather than from black. Pure black at 5% is a grey
+     film over a warm ground, which is what the No Neutral rule is about. */
+  --hairline: rgba(11, 11, 12, 0.06);
+  --ground: var(--page-ground);
+
+  position: relative;
+  padding: 72px 56px 40px;
+  background: var(--ground);
+  color: var(--ink);
+  overflow: hidden;
+  font-family: var(--font-body);
+}
+
+.our-cases__inner {
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.our-cases__announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------
+   Top row — editorial block + region filters
+   ------------------------------------------------------------ */
+
+.our-cases__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 48px;
+  /* The map is lifted into this row's band and carries an opaque ground (it
+     has to, to anchor the blend), so it would otherwise paint over the last
+     few words of the lede. The heading column stops short of the map's drawn
+     edge, so only that blank margin ends up behind the text. */
+  position: relative;
+  z-index: 1;
+}
+
+.our-cases__heading {
+  margin: 18px 0 0;
+  max-width: 520px;
+  font-family: var(--font-display);
+  font-size: calc(clamp(3.3rem, 5vw, 5.4rem) * var(--display-scale));
+  line-height: 0.94;
+  letter-spacing: calc(var(--track-display) + var(--display-tracking-delta));
+  font-weight: calc(500 + var(--display-weight-delta));
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.our-cases__lede {
+  margin: 22px 0 0;
+  max-width: 520px;
+  font-size: var(--text-body);
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.region-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 6px;
+}
+
+.region-filters__pill {
+  height: 44px;
+  padding: 0 24px;
+  border-radius: 999px;
+  border: 1px solid var(--gold-line);
+  background: var(--surface-quiet);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: #222;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease,
+    color 0.25s ease;
+}
+
+.region-filters__pill:hover {
+  transform: translateY(-2px);
+  border-color: rgba(176, 138, 83, 0.4);
+  box-shadow: 0 8px 18px -12px rgba(120, 88, 40, 0.45);
+}
+
+.region-filters__pill[data-active='true'] {
+  background: #fffaf0;
+  border-color: var(--gold-line-strong);
+  color: #17130d;
+  box-shadow: 0 6px 20px -10px rgba(176, 138, 83, 0.55);
+}
+
+/* ------------------------------------------------------------
+   Stage — map with the featured card floating over it
+   ------------------------------------------------------------ */
+
+/* The map rises alongside the heading rather than starting below it. The
+   heading column is only ~520px wide, so the right half of that band is empty
+   otherwise — and without the lift there is a 400px void between the lede and
+   the card, which reads as a mistake rather than as space. */
+.our-cases__stage {
+  position: relative;
+  margin-top: clamp(-240px, -13vw, -80px);
+}
+
+/* Karakalpakstan's populated districts all sit in the eastern half of the
+   republic; the west is the empty Ustyurt plateau. So the map is pushed right
+   and the featured card floats over that empty western third — centring the
+   card, as a world map would want, would bury every pin underneath it.
+
+   The map is sized so its left edge always runs well past the card. Sized any
+   narrower it stops short, the card ends up merely adjacent to the map rather
+   than floating on it, and the composition falls into two columns. The
+   leftmost pin sits at 50.3% of the map's width, which is the real constraint
+   here: the overlap has to be deep enough to read and shallow enough to leave
+   that pin clear. */
+.our-cases__map {
+  width: min(1040px, 68%);
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.region-map {
+  position: relative;
+  width: 100%;
+  /* The image below blends with `multiply`, and a blend only reaches as far as
+     its nearest isolating ancestor. Motion writes a `transform` on the map
+     wrapper while the entrance animation runs, which silently becomes that
+     ancestor — so for the first second the map isolated itself and painted as
+     a plain white rectangle, then snapped to blended when the transform was
+     cleared. Making this element the blending group, and giving it the
+     section's own ground colour to blend against, produces the same result at
+     every moment regardless of what an ancestor is animating. */
+  isolation: isolate;
+  background: var(--ground);
+  /* Locks the box to the source image's proportions. The pin layer places pins
+     by percentage, and those only line up with the georeference while this box
+     and the image have the same shape. */
+  aspect-ratio: 1 / 1;
+}
+
+.region-map__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* The source is drawn on flat white with a blue Aral. `multiply` drops the
+     white out into the section's warm ground — no cutout needed — and the
+     filter carries the cold blue and neutral grey over to the section's beige
+     without touching the dot pattern itself. */
+  mix-blend-mode: multiply;
+  /* Order matters. The hue rotation runs first and swings the Aral's blue
+     round to amber while leaving the neutral grey dots untouched — they have
+     no hue to rotate. The sepia then warms those greys. Doing it the other way
+     round desaturates the blue before it can be recoloured, and the Aral comes
+     out the same brown as everything else. */
+  filter: hue-rotate(-170deg) saturate(1.15) sepia(0.4) brightness(1.06);
+  opacity: 0.92;
+  user-select: none;
+  /* The western edge dissolves into the ground. It is the edge that meets the
+     heading column — between 1100 and 1440 the map's left margin runs under
+     the last words of the lede — and a hard rectangle boundary crossing live
+     text reads as a collision. Fading only that side also suits the map: the
+     Ustyurt plateau there is empty, so nothing of substance is lost, while the
+     populated east stays at full strength. */
+  mask-image: linear-gradient(to right, transparent 0, rgba(0, 0, 0, 0.5) 9%, #000 24%);
+}
+
+.region-map__overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.region-map__route {
+  fill: none;
+  stroke: var(--route);
+  /* The viewBox is 1254 units wide rendered into ~940px, so a plain
+     stroke-width of 1 lands at 0.75px and all but disappears. Opting out of
+     scaling pins the line to a real 1.2px at any map size. */
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+}
+
+.region-map__pins {
+  position: absolute;
+  inset: 0;
+}
+
+/* Centring is done with motion transforms in RegionMap, not here — see the
+   note on the pin's `style` prop. */
+.region-map__pin-slot {
+  position: absolute;
+}
+
+.region-map__pin {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.region-map__dot,
+.region-map__ring {
+  position: absolute;
+  border-radius: 50%;
+  transition:
+    width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.35s ease,
+    background-color 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.region-map__dot {
+  width: 7px;
+  height: 7px;
+  background: #c68f3c;
+  box-shadow: 0 0 0 2px rgba(248, 246, 241, 0.9);
+}
+
+.region-map__ring--mid {
+  width: 17px;
+  height: 17px;
+  border: 1px solid rgba(198, 143, 60, 0.4);
+  background: rgba(213, 177, 106, 0.14);
+}
+
+.region-map__ring--outer {
+  width: 27px;
+  height: 27px;
+  border: 1px solid rgba(198, 143, 60, 0.16);
+  opacity: 0.7;
+}
+
+.region-map__pin[data-active='true'] .region-map__dot {
+  width: 9px;
+  height: 9px;
+  background: #d99a2b;
+}
+
+.region-map__pin[data-active='true'] .region-map__ring--mid {
+  width: 24px;
+  height: 24px;
+  border-color: rgba(214, 152, 52, 0.55);
+  background: rgba(214, 152, 52, 0.18);
+}
+
+.region-map__pin[data-active='true'] .region-map__ring--outer {
+  width: 42px;
+  height: 42px;
+  border-color: rgba(214, 152, 52, 0.3);
+  background: rgba(214, 152, 52, 0.06);
+  opacity: 1;
+  animation: our-cases-pulse 2.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+/* Paused off screen. The pin only pulses to say "this is the one on the map",
+   and the map is several viewports away for most of the page — running it there
+   holds a compositor layer awake for the whole session to animate something
+   nobody can see. Same gate as the testimonial marquee and the film cue. */
+.our-cases:not([data-onscreen]) .region-map__pin[data-active='true'] .region-map__ring--outer {
+  animation-play-state: paused;
+}
+
+@keyframes our-cases-pulse {
+  0% {
+    transform: scale(0.72);
+    opacity: 0.9;
+  }
+  70% {
+    transform: scale(1.18);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.18);
+    opacity: 0;
+  }
+}
+
+.region-map__pin:hover .region-map__ring--mid,
+.region-map__pin:focus-visible .region-map__ring--mid {
+  width: 26px;
+  height: 26px;
+  border-color: rgba(198, 143, 60, 0.65);
+  background: rgba(213, 177, 106, 0.22);
+}
+
+.region-map__pin:hover .region-map__ring--outer,
+.region-map__pin:focus-visible .region-map__ring--outer {
+  width: 44px;
+  height: 44px;
+  opacity: 1;
+  border-color: rgba(198, 143, 60, 0.32);
+}
+
+/* Every route brightens together while a pin is under the pointer — they all
+   originate at the featured case, so lighting only one would misrepresent
+   which link is being highlighted. */
+.region-map:has(.region-map__pin:hover) .region-map__route,
+.region-map:has(.region-map__pin:focus-visible) .region-map__route {
+  stroke: rgba(203, 158, 75, 0.72);
+}
+
+.region-map__tooltip {
+  position: absolute;
+  bottom: calc(50% + 26px);
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 13px;
+  border-radius: 12px;
+  border: 1px solid var(--gold-line);
+  background: rgba(255, 253, 249, 0.97);
+  box-shadow: 0 14px 30px -18px rgba(60, 44, 20, 0.5);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, 6px);
+  pointer-events: none;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 3;
+}
+
+.region-map__pin-slot:hover .region-map__tooltip,
+.region-map__pin-slot:focus-within .region-map__tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.region-map__tooltip-place {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.region-map__tooltip-meta {
+  font-size: 11.5px;
+  color: var(--ink-muted);
+}
+
+/* ------------------------------------------------------------
+   Featured case card
+   ------------------------------------------------------------ */
+
+.our-cases__featured {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+.featured-case {
+  width: 640px;
+  max-width: 100%;
+  padding: 22px 22px 18px;
+  border-radius: 22px;
+  border: 1px solid var(--hairline);
+  background: #fffdfa;
+  box-shadow:
+    0 2px 4px -2px rgba(40, 30, 12, 0.06),
+    0 26px 60px -34px rgba(40, 30, 12, 0.34);
+  transition: box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.featured-case:hover {
+  box-shadow:
+    0 3px 6px -2px rgba(40, 30, 12, 0.08),
+    0 34px 74px -34px rgba(40, 30, 12, 0.44);
+}
+
+.featured-case__body {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.featured-case__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.featured-case__place {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.country-flag {
+  display: block;
+  flex: none;
+}
+
+.featured-case__country {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.featured-case__region {
+  display: block;
+  margin-top: 3px;
+  font-size: 12.5px;
+  color: var(--ink-muted);
+}
+
+.featured-case__family {
+  margin: 10px 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.featured-case__stats {
+  display: flex;
+  align-items: stretch;
+  gap: 18px;
+}
+
+.featured-case__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.featured-case__stat-label {
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+}
+
+.featured-case__stat-value {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.featured-case__divider {
+  width: 1px;
+  align-self: stretch;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(0, 0, 0, 0.09) 30%,
+    rgba(0, 0, 0, 0.09) 70%,
+    transparent
+  );
+}
+
+.featured-case__quote {
+  margin: 14px 0 0;
+  /* Quotes run between one and three lines. Without a floor the guarantee
+     strip below shifts every time the case changes. */
+  /* Scaled with the type below. The floor is two lines of it, which is what
+     it was two lines of before. */
+  min-height: 48px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.featured-case__attribution {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: rgba(18, 18, 18, 0.78);
+}
+
+.featured-case__media {
+  flex: none;
+  width: 230px;
+  height: 170px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f1ece2;
+}
+
+.featured-case__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.featured-case:hover .featured-case__image {
+  transform: scale(1.02);
+}
+
+.featured-case__guarantee {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 42px;
+  margin-top: 16px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(213, 177, 106, 0.35);
+  background: linear-gradient(90deg, #fffaef, #fffdf8);
+}
+
+.featured-case__guarantee-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #241a0c;
+}
+
+.featured-case__guarantee-left svg {
+  color: var(--gold);
+}
+
+.featured-case__guarantee-right {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+/* ------------------------------------------------------------
+   Case carousel
+   ------------------------------------------------------------ */
+
+.our-cases__carousel {
+  margin-top: 26px;
+}
+
+.cases-carousel {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.cases-carousel__viewport {
+  flex: 1 1 auto;
+  overflow: hidden;
+  /* The end card fades out rather than being sliced by the viewport edge. */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 22px,
+    #000 calc(100% - 34px),
+    transparent 100%
+  );
+}
+
+/* The track's `x` is a Motion animation (see CasesCarousel), which promotes the
+   element for the 0.65s of the slide and drops it again afterwards. Declaring
+   will-change statically here held the whole track — six case cards and their
+   photographs — on its own layer for as long as the section was mounted, to
+   pay for two thirds of a second of movement per arrow click. */
+.cases-carousel__track {
+  display: flex;
+  column-gap: 18px;
+  margin: 0;
+  padding: 6px 4px 14px;
+  list-style: none;
+}
+
+.cases-carousel__item {
+  flex: 0 0 288px;
+}
+
+.case-card {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+  /* A floor, not a fixed height. The narrow-card breakpoints leave the text
+     column tight enough for a long family name to take two lines, and a hard
+     height pushed the metrics row out through the bottom edge. */
+  min-height: 140px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease,
+    background-color 0.35s ease;
+}
+
+.case-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 34px -26px rgba(40, 30, 12, 0.5);
+}
+
+.case-card[data-active='true'] {
+  transform: translateY(-3px);
+  border-color: var(--gold-line-strong);
+  background: #fffaef;
+  box-shadow: 0 20px 38px -26px rgba(120, 88, 40, 0.55);
+}
+
+.case-card__thumb {
+  flex: none;
+  width: 96px;
+  height: 96px;
+  border-radius: 13px;
+  overflow: hidden;
+  background: #f1ece2;
+  align-self: center;
+}
+
+.case-card__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.case-card__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.case-card__place {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.case-card__place .country-flag {
+  width: 16px;
+  height: 11.2px;
+}
+
+.case-card__family {
+  margin-top: 5px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.case-card__metrics {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+/* "10.2 kW" breaking across two lines reads as a layout accident. */
+.case-card__metric {
+  white-space: nowrap;
+}
+
+.case-card__metric--money {
+  color: #8a6a33;
+}
+
+.case-card__metric-divider {
+  width: 1px;
+  height: 11px;
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.case-card__note {
+  margin-top: 5px;
+  font-size: 11.5px;
+  color: var(--ink-muted);
+}
+
+.case-card[data-active='true'] .case-card__note {
+  color: #8a6a33;
+}
+
+.cases-carousel__arrow {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--surface);
+  color: #1b1b1b;
+  cursor: pointer;
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.3s ease,
+    border-color 0.3s ease,
+    opacity 0.3s ease;
+}
+
+.cases-carousel__arrow svg {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cases-carousel__arrow:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: rgba(0, 0, 0, 0.14);
+  box-shadow: 0 14px 26px -18px rgba(40, 30, 12, 0.6);
+}
+
+.cases-carousel__arrow--prev:hover:not(:disabled) svg {
+  transform: translateX(-2px);
+}
+
+.cases-carousel__arrow--next:hover:not(:disabled) svg {
+  transform: translateX(2px);
+}
+
+.cases-carousel__arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ------------------------------------------------------------
+   Stats bar
+   ------------------------------------------------------------ */
+
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 1100px;
+  max-width: 100%;
+  min-height: 84px;
+  margin: 30px auto 0;
+  padding: 0;
+  border-radius: 22px;
+  border: 1px solid var(--hairline);
+  background: var(--surface-quiet);
+}
+
+.stats-bar__item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  align-content: center;
+  align-items: center;
+  column-gap: 14px;
+  padding: 18px 26px;
+}
+
+.stats-bar__item + .stats-bar__item {
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.stats-bar__icon {
+  grid-row: 1 / span 2;
+  color: rgba(30, 30, 30, 0.55);
+}
+
+.stats-bar__value {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.stats-bar__label {
+  grid-column: 2;
+  grid-row: 2;
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+/* ------------------------------------------------------------
+   Focus
+   ------------------------------------------------------------ */
+
+.our-cases :focus-visible {
+  outline: 2px solid rgba(176, 138, 83, 0.75);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.case-card:focus-visible,
+.region-filters__pill:focus-visible {
+  outline-offset: 4px;
+}
+
+.region-map__pin:focus-visible {
+  outline-offset: -6px;
+  border-radius: 50%;
+}
+
+/* ------------------------------------------------------------
+   Tablet
+   ------------------------------------------------------------ */
+
+@media (max-width: 1200px) {
+  .our-cases {
+    padding: 64px 40px 36px;
+  }
+
+  .our-cases__heading {
+    font-size: calc(clamp(2.9rem, 5.2vw, 4.2rem) * var(--display-scale));
+  }
+
+  /* Narrows faster than the map does, so the gap to the westernmost pin keeps
+     growing rather than closing as the viewport shrinks. */
+  .featured-case {
+    width: 520px;
+  }
+
+  .featured-case__media {
+    width: 196px;
+    height: 152px;
+  }
+
+  .cases-carousel__item {
+    flex: 0 0 262px;
+  }
+
+  /* The text column is what the narrower card takes width from, so the
+     thumbnail gives some back rather than letting every name wrap. */
+  .case-card__thumb {
+    width: 84px;
+    height: 84px;
+  }
+
+  .case-card__family {
+    font-size: 14px;
+  }
+
+  .cases-carousel__arrow {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* One breakpoint, because the three things that break here break together: the
+   filter row stops fitting beside the heading, and the map has shrunk far
+   enough that the card's right edge closes to within a few pixels of the
+   westernmost pin. So the whole composition unstacks — heading over filters,
+   map at full width, card below the map instead of floating on it. */
+@media (max-width: 1000px) {
+  .our-cases__top {
+    flex-direction: column;
+    gap: 26px;
+  }
+
+  .region-filters {
+    justify-content: flex-start;
+  }
+
+  /* The top row is full-width now, so there is no empty band beside the
+     heading for the map to rise into — and lifting it anyway would drag the
+     dot field up behind the heading and the lede. */
+  .our-cases__stage {
+    margin-top: 20px;
+  }
+
+  /* Capped, not full-bleed. The map is square, so at this width running it to
+     the gutters would make it 900px tall and push the carousel most of a
+     screen below the card. */
+  .our-cases__map {
+    width: min(100%, 700px);
+    margin: 0 auto;
+  }
+
+  /* Nothing to fade away from once the map is centred and clear of the text,
+     and a one-sided fade on a centred map reads as a rendering fault. */
+  .region-map__image {
+    mask-image: none;
+  }
+
+  /* Centred under the map and held to its width. Left to fill the container
+     the card stretched to ~920px, which strung the guarantee strip's two
+     labels to opposite ends and left the quote alone on one line. */
+  .our-cases__featured {
+    position: static;
+    top: auto;
+    transform: none;
+    max-width: 700px;
+    margin: 22px auto 0;
+  }
+
+  .featured-case {
+    width: 100%;
+  }
+
+  .featured-case__body {
+    gap: 18px;
+  }
+
+  .featured-case__media {
+    width: 220px;
+    height: 165px;
+  }
+
+  .featured-case__stat-value {
+    font-size: 18px;
+  }
+}
+
+/* ------------------------------------------------------------
+   Mobile
+   ------------------------------------------------------------ */
+
+@media (max-width: 768px) {
+  .our-cases {
+    padding: 56px 20px 32px;
+  }
+
+  .our-cases__heading {
+    font-size: calc(clamp(2.4rem, 10vw, 3.1rem) * var(--display-scale));
+    letter-spacing: calc(var(--track-headline) + var(--display-tracking-delta));
+  }
+
+  .our-cases__stage {
+    margin-top: 26px;
+  }
+
+  .region-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin: 0 -20px;
+    padding: 6px 20px 4px;
+  }
+
+  .region-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .featured-case__body {
+    flex-direction: column-reverse;
+    gap: 16px;
+  }
+
+  .featured-case__media {
+    width: 100%;
+    height: 180px;
+  }
+
+  .featured-case__quote {
+    min-height: 0;
+  }
+
+  .cases-carousel__arrow {
+    display: none;
+  }
+
+  .cases-carousel__viewport {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    margin: 0 -20px;
+    padding: 0 20px;
+    mask-image: none;
+  }
+
+  .cases-carousel__viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Swipe replaces the arrows here, so the track must sit at its natural
+     offset — this overrides the inline transform the arrows animate. */
+  .cases-carousel__track {
+    transform: none !important;
+  }
+
+  .cases-carousel__item {
+    flex: 0 0 268px;
+    scroll-snap-align: start;
+  }
+
+  .stats-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stats-bar__item {
+    padding: 16px 20px;
+  }
+
+  .stats-bar__item + .stats-bar__item {
+    border-left: 0;
+  }
+
+  .stats-bar__item:nth-child(even) {
+    border-left: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .stats-bar__item:nth-child(n + 3) {
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+  }
+}
+
+/* ------------------------------------------------------------
+   Reduced motion
+   ------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .our-cases *,
+  .our-cases *::before,
+  .our-cases *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

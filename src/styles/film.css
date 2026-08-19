@@ -1,0 +1,533 @@
+/* ============================================================
+   The film
+   ============================================================
+
+   The one near-black band above the footer, and the only section on the page
+   that is a room rather than a page. Everything either side of it is cream —
+   the ledger, then the cases — so this is a real step rather than a drift, in
+   the sense styles.css asks for: a section that needs to sit apart has to say
+   so with a step, not by going two points off its neighbour.
+
+   The step earns itself twice. A screen that is going to fill the viewport
+   should be surrounded by nothing while it does, and the cut to black is what
+   makes the opening read as the lights going down rather than as a rectangle
+   getting bigger.
+
+   Two layouts here, not one with adjustments:
+
+   - By default, and on anything narrow or with reduced motion, this is an
+     ordinary section. Heading, then a 16:9 video, then a sound button. No
+     takeover, no opening, nothing that moves on its own.
+   - On the wide stage, everything below the media query turns it into the
+     seam FilmReveal.jsx describes.
+
+   The default is written first and in full, so the fallback is the thing that
+   exists and the effect is what is added to it. */
+
+.film {
+  position: relative;
+  overflow: hidden;
+  background: var(--sol-night);
+  color: var(--sol-lit);
+  font-family: var(--font-body);
+}
+
+.film__stage {
+  position: relative;
+  padding: clamp(80px, 10vw, 140px) clamp(20px, 5vw, 56px);
+}
+
+/* ------------------------------------------------------------
+   The heading
+   ------------------------------------------------------------ */
+
+/* The Headline step, unaltered — this is a section heading and the page has
+   one size for those. It is also the step that fits: the resting card takes
+   the frame from a third of the way down, so everything above it has about
+   one viewport-quarter to live in, and the Display step would spend all of it
+   on two lines. */
+.film__title {
+  margin: 0;
+  max-width: 20ch;
+  font-family: var(--font-display);
+  font-size: calc(clamp(1.9rem, 3.4vw, 3rem) * var(--display-scale));
+  font-weight: calc(500 + var(--display-weight-delta));
+  line-height: 1.12;
+  letter-spacing: calc(var(--track-headline) + var(--display-tracking-delta));
+  color: var(--sol-lit);
+}
+
+.film__lede {
+  margin: clamp(18px, 2vw, 26px) 0 0;
+  max-width: 42ch;
+  font-size: var(--text-body);
+  line-height: 1.5;
+  color: rgba(240, 236, 226, 0.66);
+}
+
+/* Only true where the scroll is actually taken over. In the default layout the
+   section scrolls like everything else and an instruction to scroll would be
+   describing a behaviour that is not there. */
+.film__cue {
+  display: none;
+}
+
+/* ------------------------------------------------------------
+   The screen
+   ------------------------------------------------------------ */
+
+.film__frame {
+  position: relative;
+  margin-top: clamp(40px, 5vw, 68px);
+  aspect-ratio: 16 / 9;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+/* The cover crop, in container units rather than viewport ones.
+
+   A 16:9 iframe in a box that is not 16:9 either letterboxes or stretches, and
+   the usual fix — sizing it in vw/vh — is only correct when the box happens to
+   be the viewport. On the wide stage it is; here, in flow, it is not. Container
+   query units ask the frame instead of the window, so the same two lines hold
+   for both layouts.
+
+   Sized once and never again: the frame is a fixed box in both layouts, so
+   these resolve at layout time and the player is never asked to relayout while
+   anything is moving. */
+.film__media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size;
+  /* Shown until the player is mounted, and behind it forever after — a black
+     rectangle that turns into video is a section that looks broken for as long
+     as the network takes. */
+  background: var(--sol-night-deep)
+    url('https://i.ytimg.com/vi/sYIGiuycD-k/maxresdefault.jpg') center / cover
+    no-repeat;
+}
+
+.film__media iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100cqw, 177.7778cqh);
+  height: max(56.25cqw, 100cqh);
+  transform: translate(-50%, -50%);
+  border: 0;
+  /* The player has no controls and is not the interface. Without this, a click
+     anywhere on the picture opens YouTube's own chrome over the top of a
+     section that was built not to have any. */
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------
+   Sound
+   ------------------------------------------------------------
+
+   The only control. The video autoplays muted because that is the only way it
+   plays at all, which makes a play button a lie — it is already playing. What
+   the visitor actually lacks is the sound. */
+
+.film__sound {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 10px 18px;
+  border: 1px solid rgba(240, 236, 226, 0.18);
+  border-radius: 999px;
+  background: rgba(11, 11, 12, 0.5);
+  color: rgba(240, 236, 226, 0.86);
+  font-family: inherit;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: border-color 0.25s ease, color 0.25s ease,
+    background-color 0.25s ease;
+}
+
+.film__sound:hover {
+  border-color: rgba(240, 236, 226, 0.4);
+  background: rgba(11, 11, 12, 0.72);
+  color: var(--sol-lit);
+}
+
+.film__sound:focus-visible {
+  outline: 2px solid var(--sol-accent-lit);
+  outline-offset: 3px;
+}
+
+.film__exit {
+  display: none;
+}
+
+/* ============================================================
+   The wide stage — where the section becomes a seam
+   ============================================================
+
+   Pairs with WIDE_STAGE in breakpoints.js, which is the gate FilmReveal.jsx
+   arms its scroll handler behind. The two have to agree: a stylesheet that
+   lays the screen out to open with no handler to open it leaves a strip of
+   video with a third of the viewport of black above it and no way to fill it.
+   ============================================================ */
+
+@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
+  .film {
+    /* The resting card, as four insets on the viewport rather than as a width
+       and a height. It is measured from the edges because that is what the
+       clip-path wants and because it is the honest description: this is not a
+       card that happens to sit in a section, it is the viewport with most of
+       it taken away.
+
+       The top inset is the heading's room and is the number to move if the
+       title ever grows a third line. The bottom is deliberately smaller than
+       the sides, so the strip sits low and reads as rising into the frame
+       rather than as floating in the middle of it. */
+    --rest-top: 34%;
+    --rest-side: 5%;
+    --rest-bottom: 7%;
+    --rest-radius: 20px;
+
+    /* Where the middle of the resting card falls, which is the one number the
+       sound button needs and the one thing that cannot be derived from the
+       insets in CSS. Keep it in step with them: (34 + (100 - 7)) / 2. */
+    --card-mid: 63.5%;
+
+    /* The resting card again, this time as the scale that takes the viewport
+       down to it and the point that scale happens around — because that is
+       what the opening is actually made of. See .film__frame below.
+
+       All three are the insets above, rearranged, and they have to be kept in
+       step by hand because CSS cannot divide a percentage into a number:
+
+         x  = 1 - 2 × 5%             = 0.9
+         y  = 1 - 34% - 7%           = 0.59
+         oy = 34% / (1 - 0.59)       = 82.927%
+
+       `oy` is the one worth explaining. Scaling the viewport box by 0.59 about
+       a point at 82.927% of its height puts its top edge at 34% and its bottom
+       at 93% — the card's own edges. It is not the middle of the card, and it
+       is not supposed to be: it is the fixed point the whole frame is being
+       shrunk toward, which sits low precisely because the card sits low. */
+    --rest-scale-x: 0.9;
+    --rest-scale-y: 0.59;
+    --rest-origin-y: 82.927%;
+
+    /* Their reciprocals, which the media inside the frame undoes itself with.
+       Written out rather than divided, so nothing depends on how well a
+       browser handles a variable in a calc denominator. */
+    --undo-scale-x: 1.11111;
+    --undo-scale-y: 1.69492;
+
+    /* The opening. Expo-out, which is the page's ease everywhere something
+       arrives rather than merely moves: most of the distance is spent in the
+       first third, so the screen leaves with the momentum of the gesture that
+       opened it and spends the rest of the second settling.
+
+       Fractionally longer than the scroll glide it runs beside (DURATION in
+       FilmReveal.jsx), so the page has certainly landed before the picture
+       stops. The reverse order reads as the layout still catching up. */
+    --open-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --open-ms: 1000ms;
+
+    height: 100vh;
+  }
+
+  .film__stage {
+    height: 100%;
+    padding: 0;
+  }
+
+  /* A ground for the two pieces of chrome that sit on the open screen.
+
+     Neither of them can be given a colour that works, because the thing behind
+     them is a minute of footage that goes from a silhouette at dusk to a white
+     sky in the space of four seconds. Any single value is legible for part of
+     it and gone for the rest — this shot alone puts a near-white sky exactly
+     where the sound control sits. So the picture is darkened underneath them
+     instead, which is what a film would do: the type does not change, the light
+     behind it does.
+
+     Bottom only, and shallow. The controls live in the lower fifth and a scrim
+     that reached any further would be a filter over the footage rather than a
+     ground under the words. */
+  .film__stage::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    height: 34vh;
+    background: linear-gradient(
+      to top,
+      rgba(5, 5, 6, 0.62) 0%,
+      rgba(5, 5, 6, 0.28) 46%,
+      rgba(5, 5, 6, 0) 100%
+    );
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--open-ms) var(--open-ease);
+  }
+
+  .film[data-expanded='true'] .film__stage::after {
+    opacity: 1;
+  }
+
+  /* Two columns, because the heading has a third of a viewport of height to
+     live in and a stacked title-lede-cue costs more than that. The title holds
+     the left and grows down; the lede and the cue sit against its last line on
+     the right.
+
+     Anchored to the bottom rather than the top, and that is the whole reason
+     it is written as a `bottom` off the card's own inset: what has to stay
+     constant is the gap between the last line of type and the top edge of the
+     strip. Hung from the top instead, the gap is whatever is left over after
+     the title has decided how many lines it wants, and it changes with the
+     viewport, the copy and the type ramp. */
+  .film__intro {
+    position: absolute;
+    right: clamp(28px, 5vw, 88px);
+    bottom: calc(100% - var(--rest-top) + clamp(30px, 4.5vh, 58px));
+    left: clamp(28px, 5vw, 88px);
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    grid-template-areas:
+      'title lede'
+      'title cue';
+    column-gap: clamp(32px, 6vw, 120px);
+    align-items: end;
+    transition: opacity 480ms ease, transform var(--open-ms) var(--open-ease);
+  }
+
+  .film__title {
+    grid-area: title;
+    align-self: start;
+  }
+
+  .film__lede {
+    grid-area: lede;
+    margin: 0;
+    max-width: 36ch;
+  }
+
+  .film__cue {
+    grid-area: cue;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 18px 0 0;
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(240, 236, 226, 0.5);
+  }
+
+  /* The chevron drifts a few pixels on a slow loop. It is the only thing on
+     the resting frame that moves, which is the point of it: the section has
+     taken a rule of the page away and this is the one hint that it did so on
+     purpose. */
+  .film__cue svg {
+    animation: film-cue 2.4s ease-in-out infinite;
+  }
+
+  /* Held still while the section is not being looked at. An `infinite`
+     animation keeps a compositor layer awake for the whole session whether or
+     not anything can see it, and this one is a hint about a gesture that is not
+     available yet — there is nothing for it to say from three sections away.
+     The section already publishes `data-onscreen` for the contact dock, so this
+     costs no extra observer. Same pattern as the testimonial marquee. */
+  .film:not([data-onscreen='true']) .film__cue svg {
+    animation-play-state: paused;
+  }
+
+  .film[data-expanded='true'] .film__intro {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+  }
+
+  /* Always exactly the stage, which on a flush section is exactly the
+     viewport. It is never resized and never moved, and the iframe inside it is
+     never handed a new size — that part of the design is unchanged and is the
+     whole reason the opening is drawn rather than laid out.
+
+     What changed is what draws it. This was one clip-path on this element,
+     unwinding an inset rectangle to nothing, and it was the right description
+     of the effect and the wrong instruction to the browser: a clip-path
+     animation is not composited, so every frame of it re-rasterised a
+     viewport-sized region with a playing video inside. On a machine with the
+     headroom that is invisible. On one without it, the whole second is spent
+     in two or three frames and the screen appears to snap open with no
+     transition at all — which is a repaint budget problem wearing the costume
+     of a missing animation.
+
+     So the same rectangle is cut with a scale and an overflow instead. The
+     frame is the viewport, scaled down about --rest-origin-y until its edges
+     are the card's edges, and `overflow: hidden` is what crops the picture.
+     Scale is a compositor property: the opening now runs on the compositor
+     thread, at whatever the display's refresh rate is, and it keeps running
+     even while the main thread is busy with the scroll it arrived on.
+
+     The radius is divided out because a radius inside a squashed box draws as
+     an ellipse — 20px across a box scaled to 0.59 reads as 11.8px of height
+     — so it is written pre-compensated and lands as a true 20px circle. */
+  .film__frame {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    aspect-ratio: auto;
+    overflow: hidden;
+    border-radius: calc(var(--rest-radius) * var(--undo-scale-x)) /
+      calc(var(--rest-radius) * var(--undo-scale-y));
+    transform-origin: 50% var(--rest-origin-y);
+    transform: scale(var(--rest-scale-x), var(--rest-scale-y));
+    transition: transform var(--open-ms) var(--open-ease),
+      border-radius var(--open-ms) var(--open-ease);
+    will-change: transform;
+  }
+
+  .film[data-expanded='true'] .film__frame {
+    border-radius: 0;
+    transform: scale(1);
+  }
+
+  /* And undone again here, so the footage is never the thing being squashed.
+
+     The media box is the frame's box, scaled by exactly the reciprocal about
+     exactly the same point: the two cancel, and the picture sits at true
+     viewport size inside a window that is smaller than it. That is what makes
+     the resting strip a crop of the shot rather than a small copy of it —
+     which was the clip-path's one real virtue and is kept whole.
+
+     Layout is untouched by any of this, which is the other half of why it is
+     safe: `container-type: size` below measures the laid-out box, so the
+     player is sized once and never asked again. */
+  .film__media {
+    transform-origin: 50% var(--rest-origin-y);
+    transform: scale(var(--undo-scale-x), var(--undo-scale-y));
+    transition: transform var(--open-ms) var(--open-ease);
+    will-change: transform;
+  }
+
+  .film[data-expanded='true'] .film__media {
+    transform: scale(1);
+  }
+
+  /* The push. Small on paper and the difference between an image that is
+     revealed and an image that arrives: as the card opens outward the footage
+     comes forward to meet it, so the two edges of the movement are travelling
+     in opposite directions and the picture reads as coming toward the room
+     rather than the room getting larger around it.
+
+     On the player rather than on the media box that holds it, because the
+     media box is busy undoing the frame and its origin belongs to that job.
+     The player is already centred on its own middle, so the push happens
+     around the middle of the picture — which is where it was before and where
+     it has to be. */
+  .film__media iframe {
+    transition: transform var(--open-ms) var(--open-ease);
+    will-change: transform;
+  }
+
+  .film[data-expanded='true'] .film__media iframe {
+    transform: translate(-50%, -50%) scale(1.16);
+  }
+
+  /* Centred on the card at rest and on the viewport once it is open, so it
+     stays in the middle of the picture through the whole move.
+
+     It carries its own ground rather than borrowing the scrim's, because it
+     sits in the middle of the frame where a scrim would be a filter over the
+     shot. A dark disc with a lit hairline is legible against anything the
+     footage can put behind it — the disc holds against a bright sky, the
+     hairline holds against a silhouette, and the blur keeps both from reading
+     as a sticker laid on the picture. */
+  .film__sound {
+    position: absolute;
+    top: var(--card-mid);
+    left: 50%;
+    z-index: 2;
+    gap: 0;
+    margin: 0;
+    width: 62px;
+    height: 62px;
+    padding: 0;
+    justify-content: center;
+    border-color: rgba(240, 236, 226, 0.5);
+    background: rgba(5, 5, 6, 0.46);
+    box-shadow: 0 6px 30px rgba(5, 5, 6, 0.4);
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    color: var(--sol-lit);
+    transform: translate(-50%, -50%);
+    transition: top var(--open-ms) var(--open-ease),
+      width 320ms ease, height 320ms ease, border-color 0.25s ease,
+      background-color 0.25s ease;
+  }
+
+  .film[data-expanded='true'] .film__sound {
+    top: 50%;
+    width: 76px;
+    height: 76px;
+  }
+
+  .film__sound:hover {
+    border-color: rgba(240, 236, 226, 0.86);
+    background: rgba(5, 5, 6, 0.66);
+  }
+
+  /* The label is real and stays real — it is what a screen reader announces
+     and what the pressed state is attached to. It is only the sighted copy of
+     it that the circle has no room for. */
+  .film__sound-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Shown only once the screen is open, and late — the line answers a question
+     nobody has yet while the opening is still running, and arriving with it
+     would make the move look like it needed instructions. */
+  .film__exit {
+    position: absolute;
+    right: 0;
+    bottom: clamp(26px, 4vh, 46px);
+    left: 0;
+    z-index: 2;
+    display: block;
+    margin: 0;
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(240, 236, 226, 0.72);
+    opacity: 0;
+    transition: opacity 420ms ease;
+  }
+
+  .film[data-expanded='true'] .film__exit {
+    opacity: 1;
+    transition-delay: 620ms;
+  }
+
+  @keyframes film-cue {
+    0%,
+    100% {
+      transform: translateY(-2px);
+    }
+    50% {
+      transform: translateY(3px);
+    }
+  }
+}

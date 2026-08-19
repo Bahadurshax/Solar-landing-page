@@ -1,0 +1,314 @@
+/* ============================================================
+   The contact dock
+   ============================================================
+
+   Three chips in a column at the bottom right, and the only thing on the page
+   that is over the content rather than in it.
+
+   White on every hour, and that is the decision worth defending. This crosses
+   nine sections between the ledger's cream and the footer's near-black, and a
+   control that restyled itself for each would be nine designs of one object —
+   the drift the twelve colours in styles.css exist to stop. A white chip on a
+   shadow reads as a chip laid on the page against both, which is what it is:
+   not part of the composition it happens to be over.
+
+   White rather than the page's paper, and the two are only four points apart.
+   The chip is the one thing here that is not the page, and on the ledger's
+   cream a paper chip is the same surface at a different elevation — a card,
+   which is a thing the page has plenty of. Pure white is the one value in the
+   system that never appears as a ground anywhere, so the chip reads as
+   floating over rather than sitting in.
+
+   The two brand marks keep their own colours, and they are the only hues on
+   the page that are not photographs. That is a real exception to the scheme
+   and it is bought rather than assumed: nobody reads the label under a
+   messaging icon, and a monochrome WhatsApp is a shape you have to stop and
+   identify where a green one is a thing you already know. The exception is
+   held to exactly the glyphs — no coloured fill, no coloured border, nothing
+   that turns the corner of the viewport into two more brand areas. */
+
+.dock {
+  position: fixed;
+  right: clamp(14px, 1.8vw, 26px);
+  bottom: clamp(14px, 2.2vh, 26px);
+  /* Above every section's own stacking (which tops out in the forties on the
+     navbar) and below the mobile menu's 200, which is a full-screen panel that
+     nothing is allowed over. */
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+/* ------------------------------------------------------------
+   Arriving and leaving
+   ------------------------------------------------------------ */
+
+.dock[data-shown='false'] {
+  opacity: 0;
+  /* Down and slightly back, so it reads as settling into the corner rather
+     than sliding in from off-screen — it has no edge to come from, it is
+     already where it lives. */
+  transform: translateY(12px) scale(0.96);
+  pointer-events: none;
+}
+
+.dock[data-shown='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+.dock {
+  transition: opacity 0.42s ease, transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Over the open film, and under the mobile menu.
+
+   Asked of the live DOM rather than passed down as props, because both of
+   these belong to other components and a copy of somebody else's state is a
+   copy that goes stale. `visibility` as well as opacity: a transparent chip
+   still takes a click, and a click landing on an invisible Telegram link over
+   a full-screen video is the worst version of this.
+
+   Two conditions on the film, not one, and the second is not belt-and-braces.
+   `data-expanded` means the screen is open, and it stays open after the seam
+   has carried the page on to Our Cases — on purpose, so that scrolling back up
+   returns to the frame that was left. Read on its own it is therefore true for
+   every section below the film, and this rule hid the dock from Our Cases all
+   the way to the footer. `data-onscreen` is the half of the question that was
+   missing: not is the screen open, but is it the thing being looked at. */
+body:has(.film[data-expanded='true'][data-onscreen='true']) .dock,
+body:has(.mobile-menu) .dock {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px) scale(0.96);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------
+   The chips
+   ------------------------------------------------------------ */
+
+/* The filter definition is a definition, not a picture. Kept in the document
+   because a `display: none` svg drops the reference in some engines, and given
+   no size so it cannot affect layout. */
+.dock__defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.dock__round,
+.dock__pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-body);
+  text-decoration: none;
+  /* Two shadows doing two jobs. The wide, soft one is the elevation — it is
+     what separates the chip from a cream section, where a single hard shadow
+     would read as a cut-out rather than a thing above the page. The tight one
+     under it is the contact edge, and it is what stops the chip dissolving
+     into the near-black footer, where the wide one contributes nothing at all
+     and there is no border left to carry it. */
+  box-shadow: 0 8px 26px rgba(11, 11, 12, 0.16),
+    0 1px 3px rgba(11, 11, 12, 0.1);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.22s ease;
+}
+
+/* ------------------------------------------------------------
+   The glass
+   ------------------------------------------------------------
+
+   Four things stacked in one element, in the order light meets them: the page
+   is refracted, then blurred, then saturated, then tinted, and the tint is
+   the element's own background so it paints over the filtered result rather
+   than being part of what gets filtered.
+
+   The saturation is not decoration. Blurring an area averages it toward its
+   own mean, which drains it — a blurred cream section is a duller cream. Real
+   glass does not desaturate what is behind it, so the colour is put back.
+
+   Held at 0.55 rather than lower. The page underneath is mostly one flat cream
+   and the marks on top are a blue and a green that have to stay legible on
+   every section between the ledger and the footer; below about half, the chip
+   stops being a surface and starts being a smudge, and the glyphs go with it. */
+.dock__glass {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(11px) saturate(180%);
+  backdrop-filter: blur(11px) saturate(180%);
+  /* The rim, which is what makes it read as a solid rather than as a hole.
+     A bright line along the top inside edge is the light source catching the
+     bevel; the full-perimeter one is the edge of the material itself; the
+     wide, faint dark one at the bottom is the thickness seen through the near
+     face. Three inset shadows because they are three different observations,
+     and none of them is a border. */
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.92),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.42),
+    inset 0 -10px 14px -10px rgba(11, 11, 12, 0.14);
+  pointer-events: none;
+}
+
+/* The refraction, and the reason it is a separate declaration.
+
+   Safari has `backdrop-filter` and does not have displacement maps inside it,
+   and a filter it cannot apply is not ignored — the whole property drops and
+   the chip loses its blur as well. So the plain version above is what every
+   engine gets, and this replaces it only where it will work.
+
+   `hanging-punctuation` is the test because Safari is the only engine that
+   implements it, which makes `not (...)` a negative sniff for Safari and
+   nothing else. It is a sniff, and it is the one the technique is published
+   with; the failure mode if a future Safari adds the property is that it falls
+   back to the blur it already has. */
+@supports not (hanging-punctuation: first) {
+  .dock__glass {
+    /* Less blur than the fallback. The displacement is already doing most of
+       the work of hiding what is behind, and leaving the blur where it was
+       would bury the bend it just made. */
+    -webkit-backdrop-filter: url('#dock-glass') blur(5px) saturate(180%);
+    backdrop-filter: url('#dock-glass') blur(5px) saturate(180%);
+  }
+}
+
+/* Above the glass. The pane is a positioned sibling, so anything that is to be
+   seen in front of it has to be positioned too — this is the whole of that,
+   and it is why the pill's label is wrapped in an element at all. */
+.dock__round svg,
+.dock__pill-icon,
+.dock__label {
+  position: relative;
+  z-index: 1;
+}
+
+.dock__round {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+}
+
+.dock__round svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* The exception, and the whole of it: two hex values, on two glyphs.
+
+   Both are the marks' own published colours rather than an approximation of
+   them, because a brand mark in nearly the right hue is the one kind of wrong
+   that reads as a counterfeit. They are literals rather than tokens on
+   purpose — a --sol- name would file them with the page's twelve, and they are
+   emphatically not part of that system. They belong to Telegram and to
+   WhatsApp, they are here because those two companies own what these controls
+   open, and they should be as awkward to reuse as they are to justify. */
+.dock__round--telegram {
+  color: #2aabee;
+}
+
+.dock__round--whatsapp {
+  color: #25d366;
+}
+
+.dock__pill {
+  gap: 10px;
+  height: 52px;
+  padding: 0 22px;
+  border-radius: 999px;
+  color: var(--sol-ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+}
+
+/* Held back from the label it sits beside. The icon is saying what kind of
+   thing this is and the words are saying what it does; at the same weight they
+   compete, and the calendar is the less important half. */
+.dock__pill-icon {
+  color: var(--sol-ink);
+  opacity: 0.42;
+  transition: opacity 0.22s ease;
+}
+
+/* Lift and a deeper shadow, and nothing else. There is no border to light up
+   and the glyphs are already the one place colour is being spent — a gold
+   hover on top of a Telegram blue would be two accents on one control. */
+.dock__round:hover,
+.dock__pill:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(11, 11, 12, 0.2),
+    0 2px 5px rgba(11, 11, 12, 0.12);
+}
+
+.dock__pill:hover .dock__pill-icon {
+  opacity: 0.72;
+}
+
+.dock__round:focus-visible,
+.dock__pill:focus-visible {
+  outline: 2px solid var(--sol-accent);
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------
+   Narrow
+   ------------------------------------------------------------
+
+   Smaller, and the label stays. Collapsing the pill to a third circle would
+   save 90px and cost the only thing in the stack that says what any of it is
+   for — on the viewport where the navigation's own CTA is behind a burger and
+   this is the only visible call to action on the page. */
+
+@media (max-width: 600px) {
+  .dock {
+    gap: 8px;
+  }
+
+  .dock__round {
+    width: 46px;
+    height: 46px;
+  }
+
+  .dock__round svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .dock__pill {
+    height: 46px;
+    padding: 0 18px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Pairs with NO_MOTION in breakpoints.js. The dock still appears and still
+   disappears — it has to, it is the whole behaviour — it just does so without
+   travelling, and a pointer over it changes colour rather than height. */
+@media (prefers-reduced-motion: reduce) {
+  .dock,
+  .dock__round,
+  .dock__pill {
+    transition: opacity 0.2s ease;
+  }
+
+  .dock[data-shown='false'],
+  body:has(.film[data-expanded='true'][data-onscreen='true']) .dock,
+  body:has(.mobile-menu) .dock {
+    transform: none;
+  }
+
+  .dock__round:hover,
+  .dock__pill:hover {
+    transform: none;
+  }
+}

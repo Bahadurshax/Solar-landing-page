@@ -1,0 +1,445 @@
+/* ============================================================
+   How It Works - the ledger
+   ============================================================
+
+   Four rows separated by hairlines, on the night ground. The section owns no
+   colours of its own: everything below reads the twelve in styles.css, which
+   is the point of them.
+
+   The hour is daylight, and it holds at daylight whichever way the hero toggle
+   is set. This used to follow the toggle through a whole second set of tokens,
+   which meant the section had two identities and neither was the one the page
+   needed at that moment. The house is what changes hour on this page. The
+   explanation of how it works does not.
+
+   It also used to be a pinned stage of four stacking cards. That stage was the
+   section's whole argument and it cost a full viewport of pinned scroll to
+   make it, on a page that only has three such moments to spend. Giving one
+   back is most of why this exists. */
+
+.how-it-works {
+  --line: rgba(11, 11, 12, 0.14);
+  --ink-quiet: rgba(11, 11, 12, 0.42);
+
+  /* How far the row can be held back, and these two numbers are measured
+     rather than chosen.
+
+     Against this ground the ink stops meeting WCAG AA at about 0.47 alpha for
+     the titles, which are large text at 3:1, and about 0.59 for the copy at
+     4.5:1. Below those the section is quieter but the resting state is no
+     longer readable, and a list nobody can read until they touch it is not a
+     list. So the rest sits just above each floor and the lift is bought at the
+     other end instead: both rise to full or near-full ink on hover, which is a
+     much larger jump than the old 0.42 to 0.66 the copy was doing. */
+  --ink-held: rgba(11, 11, 12, 0.48);
+  --ink-faint: rgba(11, 11, 12, 0.6);
+  --ink-soft: rgba(11, 11, 12, 0.94);
+
+  position: relative;
+  width: 100%;
+  background: var(--sol-ground);
+  color: var(--sol-ink);
+  font-family: var(--font-body);
+}
+
+/* Full bleed. No measure on the section, because the hairlines are the
+   structure here and a rule that stops short of the edge reads as a card with
+   its border removed rather than as a ledger. The gutter stays, since type
+   running into the viewport edge is a different problem from type in a
+   column. */
+.how-it-works__inner {
+  padding: clamp(88px, 11vw, 168px) clamp(20px, 5vw, 56px);
+}
+
+/* ------------------------------------------------------------
+   The opening sentence
+   ------------------------------------------------------------
+
+   Kept from the previous section, and the only thing that was. It still
+   reveals word by word on the scroll, which is worth having precisely because
+   nothing else here moves until the visitor moves it. */
+
+.editorial {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  text-align: center;
+  padding-bottom: clamp(56px, 8vw, 104px);
+}
+
+.editorial__description {
+  margin: 0;
+  max-width: 46ch;
+  font-family: var(--font-display);
+  font-size: calc(clamp(2.1rem, 3.1vw, 3.4rem) * var(--display-scale));
+  font-weight: calc(650 + var(--display-weight-delta));
+  line-height: 1.12;
+  letter-spacing: calc(var(--track-display) + var(--display-tracking-delta));
+  color: var(--sol-ink);
+}
+
+.editorial__word {
+  display: inline-block;
+  white-space: pre;
+}
+
+/* ------------------------------------------------------------
+   The rows
+   ------------------------------------------------------------ */
+
+.ledger {
+  position: relative;
+}
+
+.ledger__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(16px, 3vw, 40px);
+  width: 100%;
+  /* Fixed. Nothing here resizes on hover, so nothing below it ever moves. An
+     earlier version grew the row instead, which animates a layout property and
+     shoves the rest of the page down mid-gesture. */
+  padding: clamp(24px, 3vw, 40px) 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: opacity 0.45s ease;
+}
+
+.ledger__row:last-of-type {
+  border-bottom: 1px solid var(--line);
+}
+
+/* Everything except the row under the pointer steps back. */
+.ledger:hover .ledger__row:not(:hover),
+.ledger:focus-within .ledger__row:not(:focus-within) {
+  opacity: 0.4;
+}
+
+/* ---- the whole row lights up, not just its number ----
+
+   The number already went from held back to full ink on hover. This is that,
+   extended across the row: the title and the copy sit down with it and come
+   up with it, so the row brightens as one thing rather than one character of
+   it changing while the rest stays put.
+
+   Each rises to its own reading colour, not to the same one. The title is
+   display type and lands at full ink; the copy is body text and lands at the
+   weight it would have been anyway. Flattening them to a single value on
+   hover would destroy the hierarchy at the exact moment the row is being
+   read.
+
+   It does mean the section is quiet until someone engages with it. That is
+   the intent: four rows of held-back type on an open ground, and the one you
+   are on is the one that is fully there. */
+/* Short enough that the change registers as the row answering, rather than as
+   a slow fade the eye finishes before the colour does. The transform is the
+   step-in below and is deliberately slower: colour is a state and should land
+   at once, position is a movement and wants to be seen travelling. */
+.ledger__title,
+.ledger__copy {
+  transition: color 0.25s ease,
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---- the row steps in under the pointer ----
+
+   A short move to the right on the three type cells, so the row answers the
+   hand with position as well as colour.
+
+   The control at the far end stays where it is. It is anchored to the right
+   edge of the row, and a target that slides while it is being aimed at is a
+   target that gets missed. The arrow already has its own diagonal travel.
+
+   Transform rather than padding, gap or grid columns. Those are all layout
+   properties: animating any of them on a full-bleed row re-lays-out every row
+   under it on every frame of the hover, on a section that has four of them. */
+.ledger__row:hover .ledger__num,
+.ledger__row:hover .ledger__title,
+.ledger__row:hover .ledger__copy,
+.ledger__row:focus-visible .ledger__num,
+.ledger__row:focus-visible .ledger__title,
+.ledger__row:focus-visible .ledger__copy {
+  transform: translateX(clamp(10px, 1.3vw, 20px));
+}
+
+.ledger__title {
+  color: var(--ink-held);
+}
+
+.ledger__copy {
+  color: var(--ink-faint);
+}
+
+.ledger__row:hover .ledger__title,
+.ledger__row:focus-visible .ledger__title {
+  color: var(--sol-ink);
+}
+
+.ledger__row:hover .ledger__copy,
+.ledger__row:focus-visible .ledger__copy {
+  color: var(--ink-soft);
+}
+
+.ledger__num {
+  font-size: clamp(0.9rem, 1.4vw, 1.1rem);
+  font-weight: 500;
+  color: var(--ink-quiet);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.25s ease,
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Rises to full ink rather than to the accent. The accent marks the control at
+   the other end of the row, and a row cannot have two most important things
+   in it. */
+.ledger__row:hover .ledger__num,
+.ledger__row:focus-visible .ledger__num {
+  color: var(--sol-ink);
+}
+
+.ledger__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: calc(clamp(1.4rem, 3.2vw, 2.2rem) * var(--display-scale));
+  font-weight: calc(500 + var(--display-weight-delta));
+  line-height: 1.06;
+  letter-spacing: calc(var(--track-headline) + var(--display-tracking-delta));
+}
+
+.ledger__copy {
+  margin: 0;
+  max-width: 44ch;
+  font-size: var(--text-body);
+  line-height: 1.55;
+}
+
+/* ------------------------------------------------------------
+   The control
+   ------------------------------------------------------------ */
+
+.ledger__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  /* The interface ramp's control step, so it matches every other button on the
+     page rather than inventing a size. */
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--ink-quiet);
+  transition: color 0.35s ease;
+}
+
+.ledger__more svg {
+  flex: none;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ledger__row:hover .ledger__more,
+.ledger__row:focus-visible .ledger__more {
+  color: var(--sol-accent);
+}
+
+/* Along its own diagonal, which is the only direction this arrow means. */
+.ledger__row:hover .ledger__more svg,
+.ledger__row:focus-visible .ledger__more svg {
+  transform: translate(3px, -3px);
+}
+
+.ledger__row:focus-visible {
+  outline: 2px solid var(--sol-accent);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* ------------------------------------------------------------
+   The carried photograph
+   ------------------------------------------------------------ */
+
+.ledger__carrier {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: clamp(140px, 14vw, 200px);
+  aspect-ratio: 4 / 5;
+  border-radius: 12px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 3;
+  /* Contact rather than lift: blur well past the offset, negative spread, and
+     tinted warm from the ground it is travelling over rather than from black.
+     A neutral drop on this cream reads as dirt under the picture. */
+  box-shadow: 0 40px 90px -50px rgba(58, 40, 14, 0.55);
+  /* Only opacity transitions. Position and rotation are written every frame by
+     the loop in the component, and a transition on the same properties would
+     be fighting it for the value. */
+  transition: opacity 0.32s ease;
+  will-change: transform;
+}
+
+.ledger__carrier[data-on='true'] {
+  opacity: 1;
+}
+
+.ledger__carrier img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.ledger__carrier img[data-shown='true'] {
+  opacity: 1;
+}
+
+/* In the row, for anything without a pointer to carry it. Hidden by default
+   because the wide pointer case is what this section was designed around. */
+.ledger__thumb {
+  display: none;
+  margin: 0;
+  width: 76px;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--sol-paper);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.ledger__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ------------------------------------------------------------
+   Without a pointer, or without motion
+   ------------------------------------------------------------
+
+   Both get the same layout, which is what makes this a design rather than the
+   effect switched off: the photograph returns to the row, the rows stop
+   dimming, and the control sits at reading strength permanently because there
+   is no hover left to reveal it.
+
+   The width here pairs with WIDE_VIEWPORT in src/breakpoints.js, which is what
+   the component gates the carried image on. Change one and change the other. */
+
+@media (hover: none), (max-width: 1024px), (prefers-reduced-motion: reduce) {
+  .ledger__carrier {
+    display: none;
+  }
+
+  .ledger__thumb {
+    display: block;
+  }
+
+  .ledger__row {
+    grid-template-columns: auto 76px minmax(0, 1fr) auto;
+  }
+
+  .ledger:hover .ledger__row:not(:hover),
+  .ledger:focus-within .ledger__row:not(:focus-within) {
+    opacity: 1;
+  }
+
+  /* Every row at full strength, and this is the part that matters most.
+
+     The held-back type above is only half a design: the other half is a hover
+     that undoes it. Where there is no hover, leaving the rows dimmed would
+     mean a phone shows four permanently faded steps with no way to bring any
+     of them up. The rest state exists to be lifted, so where nothing can lift
+     it, there is no rest state. */
+  .ledger__title {
+    color: var(--sol-ink);
+  }
+
+  .ledger__copy {
+    color: var(--ink-soft);
+  }
+
+  .ledger__num {
+    color: var(--sol-ink);
+  }
+
+  .ledger__more {
+    color: var(--sol-accent);
+  }
+}
+
+/* Pairs with the 768/769 breakpoint in src/breakpoints.js. */
+@media (max-width: 768px) {
+  .how-it-works__inner {
+    padding-block: clamp(72px, 14vw, 110px);
+  }
+
+  .editorial {
+    padding-bottom: clamp(40px, 10vw, 64px);
+  }
+
+  .ledger__row {
+    grid-template-columns: auto 1fr;
+    row-gap: 10px;
+    align-items: start;
+  }
+
+  .ledger__thumb {
+    grid-row: 1;
+    width: 60px;
+  }
+
+  .ledger__title,
+  .ledger__copy {
+    grid-column: 2;
+  }
+
+  /* Under the copy rather than squeezed beside it. A control that wraps to two
+     lines has stopped being a control. */
+  .ledger__more {
+    grid-column: 2;
+    margin-top: 4px;
+  }
+}
+
+/* The row still lights up, because a colour change is a state rather than a
+   motion. It just arrives at once instead of fading, and the arrow stops
+   travelling. */
+@media (prefers-reduced-motion: reduce) {
+  .ledger__row,
+  .ledger__num,
+  .ledger__title,
+  .ledger__copy,
+  .ledger__more,
+  .ledger__more svg {
+    transition: none;
+  }
+
+  .ledger__row:hover .ledger__more svg,
+  .ledger__row:focus-visible .ledger__more svg {
+    transform: none;
+  }
+
+  /* The step-in goes with it. It is travel and nothing else, so there is
+     nothing left of it to keep once the travel is gone. */
+  .ledger__row:hover .ledger__num,
+  .ledger__row:hover .ledger__title,
+  .ledger__row:hover .ledger__copy,
+  .ledger__row:focus-visible .ledger__num,
+  .ledger__row:focus-visible .ledger__title,
+  .ledger__row:focus-visible .ledger__copy {
+    transform: none;
+  }
+}

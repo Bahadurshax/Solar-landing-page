@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Partners Lab / Solstice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300..700&family=Unbounded:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after{box-sizing:border-box}
+
+/* ============================================================
+   Tokens, taken from src/styles.css and not re-decided here
+   ============================================================
+
+   The Eclipse twelve, verbatim. A lab that invents its own greys is a lab
+   that tests nothing: the whole question these five variants are answering
+   is which one belongs to THIS page, and that can only be judged in this
+   page's colours and this page's two faces.
+
+   Note for whoever reads DESIGN.md next: its Colors section still lists the
+   pre-Eclipse palette (Paper #fffdf8, Night Blue #08111c). styles.css is the
+   one that ships. These are the styles.css values. */
+:root{
+  --sol-paper:#f6f4ef;
+  --sol-ground:#edeae3;
+  --sol-sunk:#e4e0d7;
+  --sol-ink:#0b0b0c;
+
+  --sol-night:#0b0b0c;
+  --sol-night-panel:#141416;
+  --sol-night-deep:#050506;
+  --sol-lit:#f0ece2;
+
+  --sol-accent:#8a7a4e;
+  --sol-accent-lit:#f5e9c8;
+  --sol-dusk:#cfc9ba;
+
+  --font-display:'Albert Sans',system-ui,-apple-system,sans-serif;
+  --font-body:'Albert Sans',system-ui,-apple-system,sans-serif;
+  --font-accent:'Unbounded','Albert Sans',system-ui,sans-serif;
+
+  --track-display:-.055em;
+  --track-headline:-.035em;
+  --track-title:-.025em;
+  --text-body:clamp(1.08rem,1.35vw,1.25rem);
+
+  /* Section rhythm, from DESIGN.md Layout. */
+  --pad-y:clamp(88px,11vw,168px);
+  --pad-x:clamp(20px,5vw,56px);
+}
+
+/* Per-surface ink. Secondary copy is never its own token: it is the
+   foreground at reduced alpha, so it keeps the temperature of whatever it is
+   sitting on. That is the No Neutral Rule, and it is why there is no grey
+   anywhere in this file. */
+.on-night{--ink:var(--sol-lit);--soft:rgba(240,236,226,.62);--faint:rgba(240,236,226,.34);--line:rgba(240,236,226,.13);--gold:var(--sol-accent-lit)}
+.on-light{--ink:var(--sol-ink);--soft:rgba(11,11,12,.62);--faint:rgba(11,11,12,.36);--line:rgba(11,11,12,.13);--gold:var(--sol-accent)}
+
+body{margin:0;background:var(--sol-night-deep);color:var(--sol-lit);font-family:var(--font-body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img{display:block;max-width:100%}
+
+/* ---------- lab chrome ---------- */
+.lab{padding:clamp(48px,9vh,110px) var(--pad-x) 0;max-width:1500px;margin:0 auto}
+.lab h1{font-family:var(--font-display);font-size:clamp(1.9rem,3.4vw,3rem);font-weight:500;letter-spacing:var(--track-display);line-height:1;margin:0 0 22px}
+.lab p{max-width:70ch;color:rgba(240,236,226,.62);line-height:1.62;margin:0 0 16px;font-size:15px}
+.lab p b{color:var(--sol-lit);font-weight:600}
+.lab-read{border-left:2px solid var(--sol-accent-lit);padding:2px 0 2px 20px;margin:0 0 26px}
+.lab-dials{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 26px;padding:0;list-style:none}
+.lab-dials li{border:1px solid rgba(240,236,226,.13);border-radius:6px;padding:9px 14px;font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:rgba(240,236,226,.62)}
+.lab-dials b{color:var(--sol-accent-lit);font-weight:600}
+.lab-jump{display:flex;flex-wrap:wrap;gap:10px;padding:14px 0 clamp(40px,7vh,90px);margin:0;list-style:none}
+.lab-jump a{display:inline-flex;align-items:center;gap:12px;height:46px;padding:0 22px;border:1px solid rgba(240,236,226,.13);border-radius:6px;text-decoration:none;font-size:13px;color:rgba(240,236,226,.62);transition:color .2s,border-color .2s,transform .2s}
+.lab-jump a:hover{color:var(--sol-lit);border-color:rgba(240,236,226,.4);transform:translateY(-1px)}
+.lab-jump i{font-style:normal;font-size:12px;font-weight:600;letter-spacing:.14em;color:var(--sol-accent-lit)}
+
+.slab{border-top:1px solid rgba(240,236,226,.13)}
+.slab-head{max-width:1500px;margin:0 auto;padding:clamp(38px,6vh,64px) var(--pad-x) clamp(26px,4vh,40px);display:grid;grid-template-columns:auto 1fr;gap:clamp(18px,3vw,44px);align-items:baseline}
+.slab-num{font-size:clamp(1.35rem,1.65vw,1.85rem);font-weight:300;color:var(--sol-accent-lit);line-height:1;letter-spacing:var(--track-headline)}
+.slab-name{font-size:clamp(1.9rem,3.4vw,3rem);font-weight:500;letter-spacing:var(--track-headline);line-height:1.05;margin:0 0 12px}
+.slab-note{margin:0 0 8px;color:rgba(240,236,226,.62);font-size:15px;line-height:1.62;max-width:76ch}
+.slab-note b{color:var(--sol-lit);font-weight:600}
+.slab-meta{margin:14px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px 10px}
+.slab-meta li{font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(240,236,226,.34);border:1px solid rgba(240,236,226,.13);border-radius:6px;padding:6px 10px}
+@media (max-width:768px){.slab-head{grid-template-columns:1fr;gap:10px}}
+
+/* Shared section furniture. Deliberately plain: the variants differ by
+   composition, not by heading treatment, and giving each one its own heading
+   style would hide which difference is actually being tested. */
+.sec{padding:var(--pad-y) var(--pad-x);position:relative;overflow:hidden}
+.sec__in{max-width:1500px;margin:0 auto}
+.sec__h{font-size:clamp(1.9rem,3.4vw,3rem);font-weight:500;letter-spacing:var(--track-headline);line-height:1.12;margin:0;text-wrap:balance;color:var(--ink)}
+.sec__lede{margin:20px 0 0;max-width:56ch;font-size:var(--text-body);line-height:1.62;color:var(--soft)}
+
+/* The one tracked-caps label register in the system (DESIGN.md "Label").
+   Used exactly twice across the five variants, which is the eyebrow budget
+   for five sections. Everything else leads with the headline. */
+.eyebrow{margin:0 0 18px;font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+
+/* Reveal. One mechanism for all five, driven by IntersectionObserver rather
+   than a scroll listener, and collapsed to "already there" under reduced
+   motion by the block at the very bottom of this file. */
+.rv{opacity:0;transform:translateY(20px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1);transition-delay:calc(var(--i,0) * 70ms)}
+.is-in .rv,.rv.is-in{opacity:1;transform:none}
+
+/* Monogram marks. These are drawn rather than fetched because the partner
+   names below are placeholders, and a real logo on a placeholder name would
+   claim a relationship the page does not have. A ring plus two letters in the
+   page's own face is honest about being a stand-in, and it swaps out for a
+   real SVG the moment there are real partners to name. */
+.mono{display:grid;place-items:center;flex:none;border-radius:50%;border:1px solid var(--line);color:var(--ink);font-weight:500;letter-spacing:.02em;font-feature-settings:"case";transition:border-color .3s ease,color .3s ease,transform .3s ease}
+.mono--lg{width:74px;height:74px;font-size:19px}
+.mono--md{width:54px;height:54px;font-size:15px}
+.mono--sm{width:42px;height:42px;font-size:13px}
+
+/* ============================================================
+   01  LEDGER
+   ============================================================ */
+.ldg{background:var(--sol-night)}
+.ldg__in{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.35fr);gap:clamp(36px,6vw,110px);align-items:start}
+.ldg__list{margin:clamp(30px,5vh,54px) 0 0;padding:0;list-style:none}
+.ldg__row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:clamp(16px,2.4vw,30px);padding:clamp(20px,2.6vh,28px) 0;position:relative}
+/* One hairline between rows, never a box. A rule above and below every row is
+   the laziest possible list and it is what this variant exists to avoid. */
+.ldg__row+.ldg__row{border-top:1px solid var(--line)}
+.ldg__row .mono{opacity:.5;transform:scale(.94)}
+.ldg__name{font-size:clamp(1.35rem,1.65vw,1.85rem);font-weight:400;letter-spacing:var(--track-title);line-height:1.08;color:var(--ink)}
+.ldg__what{font-size:14px;color:var(--soft);text-align:right;white-space:nowrap}
+/* The gold underline is the hover state, and it is the whole interaction:
+   one hairline, drawn from the left, on the row the cursor is actually on. */
+.ldg__row::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:0 50%;transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.ldg__row:hover::after{transform:scaleX(1)}
+.ldg__row:hover .mono{opacity:1;transform:none;border-color:var(--gold);color:var(--gold)}
+@media (max-width:900px){
+  .ldg__in{grid-template-columns:1fr;gap:34px}
+  .ldg__row{grid-template-columns:auto minmax(0,1fr);gap:16px}
+  .ldg__what{grid-column:2;text-align:left;margin-top:4px}
+}
+
+/* ============================================================
+   02  DRIFT
+   ============================================================ */
+.drf{background:var(--sol-ground)}
+.drf__head{max-width:1500px;margin:0 auto clamp(46px,8vh,96px);text-align:center}
+.drf__head .sec__lede{margin-left:auto;margin-right:auto}
+.drf__band{position:relative;padding:clamp(26px,4vh,44px) 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+/* Full bleed out of the section's own gutter, because a band that stops at
+   the content column is a row, and the point of a band is that it continues
+   past the frame in both directions. */
+.drf__bleed{margin:0 calc(var(--pad-x) * -1);overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent)}
+.drf__track{display:flex;width:max-content;animation:drift 46s linear infinite}
+.drf__band:hover .drf__track{animation-play-state:paused}
+.drf__set{display:flex;align-items:center;gap:clamp(46px,7vw,110px);padding-right:clamp(46px,7vw,110px)}
+.drf__item{display:flex;align-items:center;gap:16px;white-space:nowrap}
+.drf__item span{font-size:clamp(1.35rem,1.65vw,1.85rem);font-weight:400;letter-spacing:var(--track-title);color:var(--ink)}
+@keyframes drift{to{transform:translateX(-50%)}}
+
+/* ============================================================
+   03  PLATES
+   ============================================================ */
+.plt{background:var(--sol-night-panel)}
+.plt__grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(12px,1.4vw,20px);margin-top:clamp(40px,7vh,80px)}
+/* Six partners, six cells, no filler tile. The spans are what make it a
+   composition rather than a table: two wide plates carrying photographs, four
+   narrow ones carrying a name. */
+.plt__c{border:1px solid var(--line);border-radius:16px;overflow:hidden;position:relative;background:rgba(240,236,226,.03);min-height:190px;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(20px,2.2vw,30px);text-decoration:none}
+.plt__c--a{grid-column:span 4;min-height:clamp(240px,30vw,380px)}
+.plt__c--b{grid-column:span 2}
+.plt__c--c{grid-column:span 2}
+.plt__c--d{grid-column:span 2}
+.plt__c--e{grid-column:span 2}
+/* Full width, and shorter. At span 4 it left two dead cells at the end of
+   the grid, which is the one thing a bento may never do: the grid has as
+   many cells as there is content for. As a band it also closes the
+   composition instead of trailing off. */
+.plt__c--f{grid-column:span 6;min-height:clamp(200px,20vw,280px)}
+.plt__img{position:absolute;inset:0;z-index:0}
+.plt__img img{width:100%;height:100%;object-fit:cover;transform:scale(1.03);transition:transform 1.1s cubic-bezier(.16,1,.3,1)}
+.plt__c:hover .plt__img img{transform:scale(1.07)}
+/* The scrim is what lets a name sit on a photograph at this size without a
+   pill behind it. Pills on images are banned in this house and in the skill. */
+.plt__img::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(5,6,10,.86) 0%,rgba(5,6,10,.42) 46%,rgba(5,6,10,.1) 100%)}
+.plt__body{position:relative;z-index:1;display:flex;align-items:center;gap:14px}
+.plt__name{font-size:clamp(1.35rem,1.65vw,1.85rem);font-weight:400;letter-spacing:var(--track-title);color:var(--ink)}
+.plt__c:hover{border-color:rgba(240,236,226,.28)}
+.plt__c:hover .mono{border-color:var(--gold);color:var(--gold)}
+@media (max-width:900px){
+  .plt__grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .plt__c--a,.plt__c--f{grid-column:span 2}
+  .plt__c--b,.plt__c--c,.plt__c--d,.plt__c--e{grid-column:span 1}
+}
+@media (max-width:560px){
+  .plt__grid{grid-template-columns:1fr}
+  .plt__c,.plt__c--a,.plt__c--b,.plt__c--c,.plt__c--d,.plt__c--e,.plt__c--f{grid-column:span 1}
+}
+
+/* ============================================================
+   04  RAIL
+   ============================================================ */
+.ral{background:var(--sol-sunk)}
+/* Native overflow with scroll-snap, and no pin. DESIGN.md rations the page to
+   three scroll-pinned sequences and says a fourth would make it a slideshow;
+   a horizontal hijack here would be that fourth. This gets the same lateral
+   reading without taking the scroll away from anyone. */
+.ral__rail{display:flex;gap:clamp(14px,1.6vw,22px);margin:clamp(38px,6vh,72px) calc(var(--pad-x) * -1) 0;padding:4px var(--pad-x) 22px;overflow-x:auto;scroll-snap-type:x mandatory;
+  /* Without this the first card sits flush to the viewport edge instead of on
+     the content column. Mandatory snapping aligns a `snap-align:start` child
+     to the scrollport start, which ignores the padding that was carrying the
+     gutter; scroll-padding is the one that snapping actually reads. */
+  scroll-padding-left:var(--pad-x);scrollbar-width:thin;scrollbar-color:rgba(11,11,12,.22) transparent;overscroll-behavior-x:contain}
+.ral__card{flex:0 0 clamp(230px,25vw,320px);scroll-snap-align:start;background:var(--sol-paper);border:1px solid var(--line);border-radius:16px;padding:clamp(22px,2.4vw,30px);display:flex;flex-direction:column;min-height:clamp(250px,26vw,320px);text-decoration:none;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s ease}
+/* The documented Contact-card shadow, verbatim. What was here before was a
+   hand-rolled near-duplicate of it, which is the same failure the palette
+   audit found: a value that differs from the system's by a few points and
+   therefore reads as drift rather than as a decision. Blur exceeds offset
+   and the spread is negative, per The Contact Rule, so the card reads as
+   resting on the ground rather than floating over it. */
+.ral__card:hover{transform:translateY(-3px);box-shadow:0 20px 38px -26px rgba(120, 88, 40, 0.55)}
+.ral__card:hover .mono{border-color:var(--gold);color:var(--gold)}
+/* The foot is a block, and it has to be: these are spans inside an anchor,
+   and an inline box ignores both margin-top:auto and the line break the
+   name and the role need between them. */
+.ral__foot{margin-top:auto;display:block}
+.ral__name{display:block;font-size:clamp(1.35rem,1.65vw,1.85rem);font-weight:400;letter-spacing:var(--track-title);line-height:1.1;color:var(--ink)}
+.ral__what{display:block;margin:8px 0 0;font-size:14px;color:var(--soft)}
+@media (max-width:768px){.ral__card{flex-basis:78vw}}
+
+/* ============================================================
+   05  FIELD
+   ============================================================ */
+.fld{background:var(--sol-paper)}
+.fld__stage{position:relative;margin-top:clamp(44px,7vh,90px);aspect-ratio:16/7;min-height:320px}
+/* The draw is a clip wipe rather than the usual stroke-dashoffset trick, and
+   that is a consequence of the line above. `pathLength="1"` normalises the
+   dash pattern in user units while `non-scaling-stroke` renders the stroke in
+   screen units, so the two disagree the moment the viewBox is stretched: the
+   dashes desynced from the path and the routes came out in pieces. A clip has
+   no such argument with the transform, and it wipes left to right, which is
+   the direction the eye is already travelling. */
+.fld__lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible;clip-path:inset(0 100% 0 0);transition:clip-path 1.6s cubic-bezier(.4,0,.2,1) .25s}
+.is-in .fld__lines{clip-path:inset(0)}
+/* Drawn on entry, not looping. The line is the same device the region map
+   already uses for routes, which is why this variant reads as part of the
+   page rather than as a new idea: a supply chain and a service area are the
+   same kind of drawing. */
+/* non-scaling-stroke, and it is load bearing. The viewBox is stretched to
+   the stage with preserveAspectRatio="none", which scales the stroke with
+   it: a 1px hairline was rendering about thirteen pixels thick and the
+   variant read as a diagram of itself. */
+.fld__lines path{fill:none;stroke:var(--gold);stroke-width:1;vector-effect:non-scaling-stroke;opacity:.55}
+.fld__node{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none}
+.fld__node .mono{background:var(--sol-paper)}
+/* Taken out of the node's flow so the node box is the circle and nothing
+   else. While the label counted toward the height, translate(-50%,-50%)
+   centred circle-plus-label on the route vertex, which pushed every circle
+   above the line it was supposed to be sitting on. */
+.fld__label{position:absolute;top:calc(100% + 12px);left:50%;transform:translateX(-50%);font-size:14px;font-weight:400;letter-spacing:var(--track-title);color:var(--ink);white-space:nowrap}
+.fld__node:hover .mono{border-color:var(--gold);color:var(--gold);transform:scale(1.06)}
+/* Below the wide breakpoint the field has nowhere to be a field. It becomes a
+   plain two-column set of the same nodes, and the lines are dropped rather
+   than squeezed, because a route drawing at 380px is a scribble. */
+.fld__fallback{display:none}
+@media (max-width:900px){
+  .fld__stage{display:none}
+  .fld__fallback{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 20px;margin-top:44px}
+  .fld__fallback a{display:flex;flex-direction:column;gap:12px;text-decoration:none}
+  .fld__fallback span{font-size:15px;color:var(--ink);letter-spacing:var(--track-title)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .rv{opacity:1;transform:none;transition:none}
+  .drf__track{animation:none}
+  .fld__lines{transition:none;clip-path:none}
+  .plt__img img,.ral__card,.mono,.ldg__row::after{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="lab">
+  <h1>Partners, five ways</h1>
+
+  <p class="lab-read"><b>Reading this as:</b> a new section inside an existing, documented brand system, for homeowners and small commercial buyers who want to know whose equipment ends up on their roof. Language is the page's own: warm near-monochrome, one accent, two weights of one typeface. Leaning toward native CSS in the section-stylesheet pattern the repo already uses, not a new dependency.</p>
+
+  <p>This is a <b>preserve-mode</b> addition rather than a greenfield one, so every variant below is built from the Eclipse tokens, the Albert Sans ramp, and the section rhythm in DESIGN.md. None of them introduces a colour, a face, a radius or a breakpoint the page does not already have. They differ by <b>composition</b>, which is the only variable actually worth testing.</p>
+
+  <ul class="lab-dials">
+    <li>Variance <b>7</b></li>
+    <li>Motion <b>6</b></li>
+    <li>Density <b>3</b></li>
+    <li>Mode <b>Redesign, preserve</b></li>
+  </ul>
+
+  <p><b>Placeholder data.</b> The six partners below are invented, and their marks are drawn rather than fetched. Putting a real manufacturer's logo on this page would claim a supply relationship that does not exist yet. Swap the names and drop in real SVGs when there are real ones to name; nothing in the layouts depends on the placeholder content.</p>
+
+  <p><b>Two house rules shaped these more than any aesthetic preference.</b> The Brand Face Rule means no partner name is ever set in Unbounded, so none of the five reaches for a second typeface to make a name feel important. And DESIGN.md rations the page to three scroll-pinned sequences, which is why variant 04 is a free-scrolling rail rather than the horizontal hijack this content would otherwise invite.</p>
+
+  <ul class="lab-jump">
+    <li><a href="#ledger"><i>01</i> Ledger</a></li>
+    <li><a href="#drift"><i>02</i> Drift</a></li>
+    <li><a href="#plates"><i>03</i> Plates</a></li>
+    <li><a href="#rail"><i>04</i> Rail</a></li>
+    <li><a href="#field"><i>05</i> Field</a></li>
+  </ul>
+</header>
+
+<!-- ============================================================
+     01  LEDGER
+     ============================================================ -->
+<section class="slab" id="ledger">
+  <div class="slab-head">
+    <div class="slab-num">01</div>
+    <div>
+      <h2 class="slab-name">Ledger</h2>
+      <p class="slab-note">The anti-logo-wall. Partners are set as an index at title scale, with what they supply held out to the right, and the reader gets names rather than a grid of trademarks to squint at. It is the most direct expression of the page's stated belief that a specific fact outperforms a superlative.</p>
+      <p class="slab-note"><b>Pick this if</b> the partner names carry weight on their own, or if you would rather not chase logo permissions.</p>
+      <ul class="slab-meta">
+        <li>Hour: night</li>
+        <li>Family: editorial index</li>
+        <li>Motion: hairline draw on hover</li>
+        <li>Risk: reads plain without strong names</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sec ldg on-night" data-rv>
+    <div class="sec__in ldg__in">
+      <div>
+        <h2 class="sec__h rv" style="--i:0">The people behind the parts</h2>
+        <p class="sec__lede rv" style="--i:1">We do not manufacture anything. We choose what goes on your roof, and we will tell you exactly whose it is before you sign.</p>
+      </div>
+
+      <ul class="ldg__list">
+        <li class="ldg__row rv" style="--i:1"><span class="mono mono--sm">AU</span><span class="ldg__name">Aurelis</span><span class="ldg__what">Photovoltaic modules</span></li>
+        <li class="ldg__row rv" style="--i:2"><span class="mono mono--sm">KE</span><span class="ldg__name">Kessler Energie</span><span class="ldg__what">Inverters</span></li>
+        <li class="ldg__row rv" style="--i:3"><span class="mono mono--sm">TV</span><span class="ldg__name">Torvan</span><span class="ldg__what">Storage</span></li>
+        <li class="ldg__row rv" style="--i:4"><span class="mono mono--sm">ME</span><span class="ldg__name">Meridia</span><span class="ldg__what">Mounting systems</span></li>
+        <li class="ldg__row rv" style="--i:5"><span class="mono mono--sm">HA</span><span class="ldg__name">Halden</span><span class="ldg__what">Monitoring</span></li>
+        <li class="ldg__row rv" style="--i:6"><span class="mono mono--sm">OQ</span><span class="ldg__name">Oqtosh Metall</span><span class="ldg__what">Frames, made in Nukus</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     02  DRIFT
+     ============================================================ -->
+<section class="slab" id="drift">
+  <div class="slab-head">
+    <div class="slab-num">02</div>
+    <div>
+      <h2 class="slab-name">Drift</h2>
+      <p class="slab-note">One band, moving slowly, bled past both gutters and faded at the edges so it reads as a continuing line rather than a row that happens to be wide. The motion is doing one job: saying there are more of these than the frame can hold. It pauses on hover so anyone who wants to actually read a name can.</p>
+      <p class="slab-note"><b>Pick this if</b> the section should cost the page almost nothing, and breadth matters more than detail. Cheapest of the five in vertical space by a wide margin.</p>
+      <p class="slab-note"><b>The objection, and it is a fair one:</b> a band that moves on its own asks for attention it has not earned, and half its content is off screen at any moment. It pauses on hover and stops dead under reduced motion, but a reader who never hovers never sees the full list. If this one is chosen, that trade is the thing to settle first.</p>
+      <ul class="slab-meta">
+        <li>Hour: midday</li>
+        <li>Family: marquee band</li>
+        <li>Motion: continuous, pausable</li>
+        <li>Risk: only one marquee per page</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sec drf on-light" data-rv>
+    <div class="drf__head">
+      <h2 class="sec__h rv" style="--i:0">Chosen, not sponsored</h2>
+      <p class="sec__lede rv" style="--i:1">Nobody pays to be on this list. These are the parts we would put on our own roofs.</p>
+    </div>
+
+    <div class="drf__band rv" style="--i:2">
+      <div class="drf__bleed">
+        <div class="drf__track">
+          <div class="drf__set" aria-hidden="false">
+            <span class="drf__item"><span class="mono mono--md">AU</span><span>Aurelis</span></span>
+            <span class="drf__item"><span class="mono mono--md">KE</span><span>Kessler Energie</span></span>
+            <span class="drf__item"><span class="mono mono--md">TV</span><span>Torvan</span></span>
+            <span class="drf__item"><span class="mono mono--md">ME</span><span>Meridia</span></span>
+            <span class="drf__item"><span class="mono mono--md">HA</span><span>Halden</span></span>
+            <span class="drf__item"><span class="mono mono--md">OQ</span><span>Oqtosh Metall</span></span>
+          </div>
+          <!-- The duplicate is the loop, and it is hidden from screen readers
+               so the list is announced once rather than twice. -->
+          <div class="drf__set" aria-hidden="true">
+            <span class="drf__item"><span class="mono mono--md">AU</span><span>Aurelis</span></span>
+            <span class="drf__item"><span class="mono mono--md">KE</span><span>Kessler Energie</span></span>
+            <span class="drf__item"><span class="mono mono--md">TV</span><span>Torvan</span></span>
+            <span class="drf__item"><span class="mono mono--md">ME</span><span>Meridia</span></span>
+            <span class="drf__item"><span class="mono mono--md">HA</span><span>Halden</span></span>
+            <span class="drf__item"><span class="mono mono--md">OQ</span><span>Oqtosh Metall</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     03  PLATES
+     ============================================================ -->
+<section class="slab" id="plates">
+  <div class="slab-head">
+    <div class="slab-num">03</div>
+    <div>
+      <h2 class="slab-name">Plates</h2>
+      <p class="slab-note">Six partners, six cells, no filler tile. Two wide plates carry real photographs of the hardware and four narrow ones carry a name, so the grid has a rhythm instead of being six identical boxes. It is the only variant that shows the equipment rather than just naming who made it.</p>
+      <p class="slab-note"><b>Pick this if</b> the section needs to carry visual weight, or if it is going to sit between two type-heavy sections that need breaking up.</p>
+      <ul class="slab-meta">
+        <li>Hour: dusk</li>
+        <li>Family: bento grid</li>
+        <li>Motion: slow scale on hover</li>
+        <li>Risk: needs real photography</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sec plt on-night" data-rv>
+    <div class="sec__in">
+      <p class="eyebrow rv" style="--i:0">What we install</p>
+      <h2 class="sec__h rv" style="--i:1">What ends up on your roof</h2>
+
+      <div class="plt__grid">
+        <a class="plt__c plt__c--a rv" style="--i:1" href="#">
+          <span class="plt__img"><img src="/images/solar-capture-day.png" alt="A roof array in full daylight" loading="lazy" /></span>
+          <span class="plt__body"><span class="mono mono--md">AU</span><span class="plt__name">Aurelis</span></span>
+        </a>
+        <a class="plt__c plt__c--b rv" style="--i:2" href="#">
+          <span class="plt__body"><span class="mono mono--md">KE</span><span class="plt__name">Kessler Energie</span></span>
+        </a>
+        <a class="plt__c plt__c--c rv" style="--i:3" href="#">
+          <span class="plt__body"><span class="mono mono--md">TV</span><span class="plt__name">Torvan</span></span>
+        </a>
+        <a class="plt__c plt__c--d rv" style="--i:4" href="#">
+          <span class="plt__body"><span class="mono mono--md">ME</span><span class="plt__name">Meridia</span></span>
+        </a>
+        <a class="plt__c plt__c--e rv" style="--i:5" href="#">
+          <span class="plt__body"><span class="mono mono--md">OQ</span><span class="plt__name">Oqtosh Metall</span></span>
+        </a>
+        <a class="plt__c plt__c--f rv" style="--i:6" href="#">
+          <span class="plt__img"><img src="/images/smart-controller.png" alt="The wall mounted controller that runs the system" loading="lazy" /></span>
+          <span class="plt__body"><span class="mono mono--md">HA</span><span class="plt__name">Halden</span></span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     04  RAIL
+     ============================================================ -->
+<section class="slab" id="rail">
+  <div class="slab-head">
+    <div class="slab-num">04</div>
+    <div>
+      <h2 class="slab-name">Rail</h2>
+      <p class="slab-note">A lateral read that does not take the scroll away from anyone. Cards snap, the rail bleeds off the right edge so it is visibly continuable, and the section holds a fixed height no matter how many partners are added later. The one variant that scales past six without a redesign.</p>
+      <p class="slab-note"><b>Pick this if</b> the list is going to grow, or if the page needs a horizontal moment but cannot afford a fourth pinned sequence.</p>
+      <ul class="slab-meta">
+        <li>Hour: dawn</li>
+        <li>Family: snap rail</li>
+        <li>Motion: lift on hover, native scroll</li>
+        <li>Risk: right-edge content is missable</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sec ral on-light" data-rv>
+    <div class="sec__in">
+      <div>
+          <h2 class="sec__h rv" style="--i:0">Who makes what</h2>
+          <p class="sec__lede rv" style="--i:1">Every part of the system comes from somewhere. This is the whole list, and it is short on purpose.</p>
+      </div>
+
+      <div class="ral__rail rv" style="--i:3" tabindex="0" role="group" aria-label="Suppliers">
+        <a class="ral__card" href="#"><span class="mono mono--lg">AU</span><span class="ral__foot"><span class="ral__name">Aurelis</span><span class="ral__what">Photovoltaic modules</span></span></a>
+        <a class="ral__card" href="#"><span class="mono mono--lg">KE</span><span class="ral__foot"><span class="ral__name">Kessler Energie</span><span class="ral__what">Inverters</span></span></a>
+        <a class="ral__card" href="#"><span class="mono mono--lg">TV</span><span class="ral__foot"><span class="ral__name">Torvan</span><span class="ral__what">Storage</span></span></a>
+        <a class="ral__card" href="#"><span class="mono mono--lg">ME</span><span class="ral__foot"><span class="ral__name">Meridia</span><span class="ral__what">Mounting systems</span></span></a>
+        <a class="ral__card" href="#"><span class="mono mono--lg">HA</span><span class="ral__foot"><span class="ral__name">Halden</span><span class="ral__what">Monitoring</span></span></a>
+        <a class="ral__card" href="#"><span class="mono mono--lg">OQ</span><span class="ral__foot"><span class="ral__name">Oqtosh Metall</span><span class="ral__what">Frames, made in Nukus</span></span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     05  FIELD
+     ============================================================ -->
+<section class="slab" id="field">
+  <div class="slab-head">
+    <div class="slab-num">05</div>
+    <div>
+      <h2 class="slab-name">Field</h2>
+      <p class="slab-note">The suppliers placed on an open field and joined by a drawn hairline, which is the same device the region map already uses for routes. That is the argument for it: a supply chain and a service area are the same kind of drawing, so this variant reads as something the page already knew how to do rather than as a new idea bolted on.</p>
+      <p class="slab-note"><b>Pick this if</b> you want the section to feel authored. It is the highest-variance option here and the one most likely to look like a diagram if the lines are turned up even slightly.</p>
+      <ul class="slab-meta">
+        <li>Hour: late afternoon</li>
+        <li>Family: constellation</li>
+        <li>Motion: line draws on entry</li>
+        <li>Risk: closest to decoration</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sec fld on-light" data-rv>
+    <div class="sec__in">
+      <h2 class="sec__h rv" style="--i:0">Six suppliers, one system</h2>
+
+      <div class="fld__stage">
+        <svg class="fld__lines" viewBox="0 0 100 44" preserveAspectRatio="none" aria-hidden="true">
+          <path vector-effect="non-scaling-stroke" d="M14 20 L34 9 L57 17 L79 8" />
+          <path vector-effect="non-scaling-stroke" d="M14 20 L30 34 L57 17" />
+          <path vector-effect="non-scaling-stroke" d="M30 34 L64 37 L79 8" />
+        </svg>
+
+        <a class="fld__node rv" style="--i:1;left:14%;top:45%" href="#"><span class="mono mono--lg">AU</span><span class="fld__label">Aurelis</span></a>
+        <a class="fld__node rv" style="--i:2;left:34%;top:20%" href="#"><span class="mono mono--md">KE</span><span class="fld__label">Kessler Energie</span></a>
+        <a class="fld__node rv" style="--i:3;left:57%;top:39%" href="#"><span class="mono mono--lg">TV</span><span class="fld__label">Torvan</span></a>
+        <a class="fld__node rv" style="--i:4;left:79%;top:18%" href="#"><span class="mono mono--md">ME</span><span class="fld__label">Meridia</span></a>
+        <a class="fld__node rv" style="--i:5;left:30%;top:77%" href="#"><span class="mono mono--md">HA</span><span class="fld__label">Halden</span></a>
+        <a class="fld__node rv" style="--i:6;left:64%;top:84%" href="#"><span class="mono mono--md">OQ</span><span class="fld__label">Oqtosh Metall</span></a>
+      </div>
+
+      <div class="fld__fallback">
+        <a href="#"><span class="mono mono--md">AU</span><span>Aurelis</span></a>
+        <a href="#"><span class="mono mono--md">KE</span><span>Kessler Energie</span></a>
+        <a href="#"><span class="mono mono--md">TV</span><span>Torvan</span></a>
+        <a href="#"><span class="mono mono--md">ME</span><span>Meridia</span></a>
+        <a href="#"><span class="mono mono--md">HA</span><span>Halden</span></a>
+        <a href="#"><span class="mono mono--md">OQ</span><span>Oqtosh Metall</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+/* One observer for the whole page. A scroll listener would run this on every
+   frame for five sections that each need to be told once. */
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('[data-rv]');
+
+  if (reduce || !('IntersectionObserver' in window)) {
+    targets.forEach(function (el) { el.classList.add('is-in'); });
+    return;
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-in');
+      io.unobserve(entry.target);
+    });
+  }, { threshold: 0.16 });
+
+  targets.forEach(function (el) { io.observe(el); });
+})();
+</script>
+
+</body>
+</html>

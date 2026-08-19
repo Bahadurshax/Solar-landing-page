@@ -1,0 +1,111 @@
+{
+  "buildPath": "code",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-color",
+        "value": "rgba(36, 71, 88, 0.28)",
+        "createdAt": "2026-08-17T10:20:39.637Z",
+        "reason": "Photographic scrim: top stop of the overlay gradient graded to the card's golden-hour photo in HowItWorks STEPS. Pre-existing, not a UI/brand colour. Claude's call, not user-confirmed."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "*",
+        "files": [
+          "public/footer-lab.html"
+        ],
+        "createdAt": "2026-08-18T07:32:46.859Z",
+        "reason": "temporary footer chooser fixture, deleted once a variant is picked; lab chrome type is not the shipping ramp"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "*",
+        "files": [
+          "public/footer-lab.html"
+        ],
+        "createdAt": "2026-08-18T07:32:47.135Z",
+        "reason": "palette read straight from src/styles.css Eclipse tokens; DESIGN.md sidecar is stale so every --sol-* literal reads as drift"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "*",
+        "files": [
+          "public/footer-lab.html"
+        ],
+        "createdAt": "2026-08-18T07:37:24.414Z",
+        "reason": "temporary footer chooser fixture; each variant carries its own radius language on purpose so they can be compared"
+      },
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "public/footer-lab.html"
+        ],
+        "createdAt": "2026-08-18T07:41:22.088Z",
+        "reason": "inset glow only, no outer neon: variant 03 is a window lighting from the inside, which is the sanctioned inner-shadow pattern rather than a halo"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "18px",
+        "createdAt": "2026-08-18T09:54:06.994Z",
+        "reason": "Existing page value, not a new one: our-cases.css:617 already sets 18px on its case cards. DESIGN.md's Shape note only records the navbar CTA (11px) and the pill controls (999px) and never documented the card radius the page actually ships."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#2aabee",
+        "createdAt": "2026-08-18T10:51:20.422Z",
+        "reason": "user confirmed: asked for the dock to match floating_buttons.png, which shows the Telegram mark in its own brand blue. Official Telegram colour, applied to the glyph only."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#25d366",
+        "createdAt": "2026-08-18T10:51:20.599Z",
+        "reason": "user confirmed: same reference image, WhatsApp mark in its own brand green. Official WhatsApp colour, applied to the glyph only."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#ffffff",
+        "createdAt": "2026-08-18T10:51:20.748Z",
+        "reason": "user confirmed: the reference shows white floating chips. Deliberately not --sol-paper: pure white is the one value that is never a ground in this palette, so the chip reads as floating over the page rather than as a card in it."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(255, 255, 255, 0.55)",
+        "createdAt": "2026-08-18T11:03:21.297Z",
+        "reason": "Alpha of the chip white already sanctioned this session (#ffffff). The glass pane has to be translucent to be glass at all — an opaque tint would filter nothing."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(255, 255, 255, 0.92)",
+        "createdAt": "2026-08-18T11:03:21.450Z",
+        "reason": "Same white, as the specular rim on the glass pane. Highlight on a bevel, not a palette colour."
+      },
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "public/partners-lab.html"
+        ],
+        "createdAt": "2026-08-19T09:25:17.737Z",
+        "reason": "DESIGN.md Contact Rule mandates the opposite of this rule: 'a shadow with zero or positive spread, or with a neutral colour, does not belong to this system'. The only shadow in this file is the documented Contact-card token (0 20px 38px -26px rgba(120,88,40,.55)) on a light ground, which is offset and negative-spread, not the zero-offset halo the rule describes."
+      },
+      {
+        "rule": "marquee",
+        "value": "*",
+        "files": [
+          "public/partners-lab.html"
+        ],
+        "createdAt": "2026-08-19T09:25:25.629Z",
+        "reason": "Variant lab, not a shipped section: variant 02 Drift is deliberately the marquee option among five mutually exclusive candidates, and the rule's objection is written into the variant's own note in the page so it informs the choice. Scoped to this file only; if Drift is the one selected, the objection must be settled before it reaches src/."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "18px",
+        "createdAt": "2026-08-19T11:12:08.260Z",
+        "reason": "Carried over verbatim from the shipping testimonial card, not a new step: the quote is set at clamp(18px, 1.45vw, 22px), a display-set size between DESIGN.md's body and title ramps that the page already ships. DESIGN.md's frontmatter is documented stale (see CLAUDE.md). Claude's call, not user-confirmed."
+      }
+    ]
+  }
+}

@@ -1,0 +1,603 @@
+/* ============================================================
+   Schedule the installation
+   ============================================================
+
+   Two columns that are not balancing each other: the photograph runs full
+   bleed on the left, the form runs full height on lit paper at the right.
+   Nothing floats, nothing is a card on a background — the split is the
+   composition, so the seam between photo and paper is the only edge in it.
+
+   The hour is early evening, indoors. About ends outdoors at dusk, this is
+   the lit room you step into to arrange the work, and the testimonial wall's
+   cream is the next morning. */
+
+.quote {
+  --q-paper: var(--page-paper);
+  --q-ink: var(--sol-ink);
+  /* Tinted from the ink, never stepped toward grey — a neutral on this paper
+     reads as dirt. */
+  --q-ink-soft: rgba(11, 11, 12, 0.72);
+  --q-ink-quiet: rgba(11, 11, 12, 0.58);
+  --q-gold: var(--sol-accent);
+  --q-line: rgba(11, 11, 12, 0.14);
+  /* The field sits below the paper it is set into, which is the one job the
+     ground token does that paper cannot. */
+  --q-field: var(--sol-ground);
+  /* The system's one semantic state colour. It carries required marks and
+     validation errors, and it is a warm red-brown rather than a signal red so
+     it belongs to this palette — see DESIGN.md, Colors. */
+  --q-warn: var(--sol-warn);
+
+  position: relative;
+  /* Above About, which is where the arrival below happens. About holds itself
+     still at the end of its pan and this band climbs over the top of it, so it
+     has to be the thing in front — it is not following that section, it is
+     covering it. `.about` is positioned but takes no z-index of its own, so
+     one is enough. */
+  z-index: 1;
+  background: var(--q-paper);
+  color: var(--q-ink);
+  font-family: var(--font-body);
+
+  /* The other half of About's hold. That section stays pinned for one viewport
+     past the end of its pan, and this pulls the band up by the same distance
+     so it spends that scroll rising into the frame instead of waiting below
+     it. The band is opaque and full height, so what it reads as is the section
+     underneath being covered from the bottom up.
+
+     `--about-cover` is measured and published by AboutSection, and only while
+     the pinned branch is running — the stacked layout and reduced motion both
+     clear it, which leaves this a margin of zero and the two sections simply
+     following one another. The fallback matters for the first paint, before
+     any of that has been measured. */
+  margin-top: calc(-1 * var(--about-cover, 0px));
+}
+
+/* The parts nobody draws. A default blue drag-select across a form the
+   visitor is filling in is the most visible place browser chrome leaks
+   through. */
+.quote ::selection {
+  background: var(--q-gold);
+  color: #fffdf8;
+}
+
+/* The drawing is contained rather than cropped, so the column's proportions
+   no longer decide what survives — they decide how much paper surrounds it.
+   It still takes the larger share: it is a wide frame, and the form is a
+   column of fields that gains nothing from more width.
+
+   The form sets the height, being the taller of the two. The floor below only
+   catches the case where a browser autofills every field and the form
+   collapses shorter than the drawing deserves. */
+.quote__grid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  align-items: stretch;
+  /* One screen, never more. The form is the tall side and was setting the
+     height, which pushed the section past the fold and made the photograph
+     beside it enormous. Pinned to the viewport instead: the picture fills its
+     column exactly, and if a short window cannot hold every field the form
+     column scrolls on its own rather than stretching the section. */
+  height: 100svh;
+  max-height: 100svh;
+}
+
+/* ------------------------------------------------------------
+   The photograph
+   ------------------------------------------------------------ */
+
+/* Full bleed, and it now carries the section's words as well as its picture.
+   The seam between this column and the paper one is the composition: the
+   argument is made on the photograph, and the paper beside it is where you
+   answer. */
+.quote__figure {
+  position: relative;
+  display: flex;
+  /* The copy sits at the head of the frame, on the band of open sky above the
+     ridge. It used to sit on the floor, on the reasoning that the roofer is
+     high in the picture and the bottom therefore has least happening in it —
+     true, but the bottom is also the panel he is fitting, which is dark, angled
+     and full of cell lines. Sky is the quieter surface of the two, and it is
+     the one place in this photograph with nothing in it to read against.
+
+     It also puts the heading where a heading goes. The section is a form, and
+     the words that say what the form is for were arriving under it. */
+  align-items: flex-start;
+  overflow: hidden;
+  /* Its own floor, so a slow decode shows warm ground rather than white. */
+  background: #e0cba4;
+}
+
+/* The scrim, and it is a gradient rather than a wash.
+
+   This column used to carry no scrim at all, on the argument that darkening
+   the frame pays for legibility with the photograph. That argument held while
+   the copy sat on the floor of the picture, on a dark angled panel. At the head
+   of the frame it does not: the top band is sky at the left and a white hard
+   hat at the right, and white type crossing a white helmet is not a contrast
+   problem a text-shadow can solve.
+
+   So it darkens the top and nothing else. The ramp is anchored to the head of
+   the frame, reaches nothing by 62%, and the roofer, the panel he is fitting
+   and the whole lower half of the picture stay at full strength — which was
+   the point of refusing a wash in the first place.
+
+   Five stops rather than two, because a plain linear ramp over this distance
+   shows its own edge as a soft band across the sky. The intermediate stops bend
+   it into an ease-out, so it reads as light falling off rather than as a shape
+   laid over the photograph.
+
+   Warm near-black, not neutral: the No Neutral rule applies to a scrim as much
+   as to a shadow, and grey over this sky would silt it. */
+.quote__figure::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 62%;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(12, 10, 6, 0.62) 0%,
+    rgba(12, 10, 6, 0.5) 20%,
+    rgba(12, 10, 6, 0.32) 42%,
+    rgba(12, 10, 6, 0.14) 66%,
+    rgba(12, 10, 6, 0) 100%
+  );
+}
+
+/* The type keeps its own shadow on top of the scrim. The two are doing
+   different jobs: the scrim lowers the whole ground the letters sit on, and the
+   shadow holds each letterform's edge against whatever survives underneath it.
+
+   The shadow is tight and warm rather than a soft black halo: enough to hold
+   the letterform against a bright roof tile, not enough to read as a glow. */
+.quote__figure-copy {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+  padding: clamp(28px, 3.4vw, 56px);
+  /* One tight shadow, no wide blur. A large soft halo behind display type is
+     a dark patch on the photograph by another name, which is the thing this
+     is meant to avoid. */
+  text-shadow: 0 1px 3px rgba(12, 10, 6, 0.6);
+}
+
+/* Lit type: the same pairing the page uses everywhere the light has gone. */
+.quote__figure-copy .quote__title {
+  color: #fffdf8;
+}
+
+.quote__figure-copy .quote__lede {
+  max-width: 38ch;
+  color: rgba(255, 253, 248, 0.92);
+}
+
+/* Absolute, not a flex item. The figure is a flex container so the copy can
+   be pinned to its floor, and an in-flow image would sit *beside* that copy
+   and take the whole column with it — which is exactly what hid the heading.
+   The picture is a backdrop; only the words are in flow. */
+.quote__figure-media {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* The roofer sits high in a tall frame. Cropping from the centre would take
+     the top of the ridge and leave a band of empty tile at the bottom. */
+  object-position: 50% 38%;
+}
+
+/* ------------------------------------------------------------
+   The form panel
+   ------------------------------------------------------------ */
+
+.quote__panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Tighter than a display section would be, because this column has to hold
+     six fields and a button inside one screen. */
+  padding: clamp(32px, 3.6vw, 64px) clamp(24px, 4vw, 64px);
+  /* The release valve for the fixed height above. On a laptop the form fits
+     and this never engages; on a short window it scrolls the fields rather
+     than the section. */
+  overflow-y: auto;
+}
+
+.quote__form-wrap {
+  width: 100%;
+  /* A field column wider than this stops scanning as one thing. */
+  max-width: 452px;
+}
+
+/* Both of these live in the figure now rather than above the form. They keep
+   their neutral colours here and are re-inked over the photograph above, so
+   the same pair would still work on paper if the columns are ever swapped. */
+.quote__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: calc(clamp(1.9rem, 3.4vw, 3rem) * var(--display-scale));
+  font-weight: calc(500 + var(--display-weight-delta));
+  line-height: 1.12;
+  letter-spacing: calc(var(--track-headline) + var(--display-tracking-delta));
+  text-wrap: balance;
+}
+
+.quote__lede {
+  margin: 14px 0 0;
+  max-width: 46ch;
+  color: var(--q-ink-soft);
+  font-size: var(--text-body);
+  line-height: 1.62;
+  text-wrap: pretty;
+}
+
+/* No top margin: the form is the only thing in this column now, and the
+   panel's own padding is what holds it off the edges. */
+.quote__form {
+  margin-top: 0;
+}
+
+/* Tight inside a field, generous between them: the label belongs to its own
+   input and to nothing else, and the gap is the only thing keeping one field
+   off the next.
+
+   Wider than it was, because it is doing more than it was. With boxes, two
+   adjacent fields were held apart by two borders and 14px; with rules, the
+   only thing below a field is the next field's label, and 14px put it close
+   enough to the line above to look like a caption on it. */
+.quote__field + .quote__field {
+  margin-top: 20px;
+}
+
+/* The frame the label moves inside. */
+.quote__field {
+  position: relative;
+}
+
+/* ------------------------------------------------------------
+   Floating labels
+   ------------------------------------------------------------
+
+   The label starts where the visitor's answer will go — at 16px, on the
+   field's own baseline, reading as the thing they are about to type over —
+   and lifts into the lane above it the moment the field takes focus or holds
+   a value. Two states, one movement, no third resting place.
+
+   It rides the input's state through a sibling selector rather than React:
+   `:focus` covers the click, `:not(:placeholder-shown)` covers the value, so
+   a field the browser autofilled or restored on a back-navigation is already
+   lifted on first paint instead of animating late. Nothing here needs to know
+   what the form thinks.
+
+   The lift is transform-only — a translate and a scale from the top-left
+   corner, so the left edge stays pinned to the field's text inset and the
+   whole thing composites rather than reflowing 22 characters per frame. It is
+   why the type is 16px scaled to 0.75 instead of a font-size animation: the
+   floated size is 12px either way, and only one of the two is free. */
+
+.quote__label {
+  position: absolute;
+  /* The input's own text inset, and it has to be exactly that or the lift
+     reads as a jump. It was 16px and 23px when the field was a box — 15px and
+     22px of padding over a 1px border on each edge. With the box down to one
+     rule there is no left border and no top one: the caret starts on the
+     column's edge, and so does this. */
+  left: 0;
+  top: 22px;
+  /* Clicks fall through to the input underneath. The label covers the field's
+     whole first line at rest, and a click that lands on it should put the
+     caret where the visitor aimed rather than at the end of the value. */
+  pointer-events: none;
+  transform-origin: 0 0;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--q-ink-quiet);
+  /* Matches the input it sits on: same family, same 16px, same line box. */
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  text-overflow: ellipsis;
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+}
+
+/* Lifted: 15px up and three-quarter size, which lands the cap height in the
+   padding lane the input reserves at its top. */
+.quote__input:focus + .quote__label,
+.quote__input:not(:placeholder-shown) + .quote__label {
+  transform: translateY(-15px) scale(0.75);
+  color: var(--q-ink-soft);
+}
+
+/* Chrome's autofill preview fills the box before the value is committed, and
+   `:placeholder-shown` is still true while it does. Kept in a rule of its own:
+   a selector no engine recognises would invalidate the whole list above it. */
+.quote__input:-webkit-autofill + .quote__label {
+  transform: translateY(-15px) scale(0.75);
+  color: var(--q-ink-soft);
+}
+
+/* Full ink on the active field, not gold. The gold is already carrying the
+   border, and a second gold mark at 12px would be both quieter than the ink
+   it replaced and the lowest-contrast text on the page. */
+.quote__input:focus + .quote__label {
+  color: var(--q-ink);
+}
+
+.quote__input[aria-invalid='true'] + .quote__label {
+  color: var(--q-warn);
+}
+
+.quote__req {
+  margin-left: 3px;
+  color: var(--q-warn);
+}
+
+/* ------------------------------------------------------------
+   The fields
+   ------------------------------------------------------------
+
+   One rule per field rather than four. A box drawn on all sides says "this is
+   a container, put something in it", which a field on its own in a column does
+   not need told twice — the label is already inside it saying exactly that.
+   What the visitor actually has to see is where the answer goes, and that is
+   one line.
+
+   It is also six fewer closed shapes in a panel that already has a photograph
+   beside it and a filled button under it. Six boxes stacked in a 452px column
+   read as a grid of empty cells; six rules read as a list of things to answer.
+
+   No fill either, and that is the same decision rather than a second one: a
+   filled box with a line under only one edge is a box with three sides
+   missing. The field is the paper, and the rule is where the writing sits. */
+.quote__input {
+  width: 100%;
+  /* Asymmetric on purpose: the top padding is the lane the floated label
+     lifts into, and the value sits below it. No horizontal padding now — with
+     the box gone there is no inside to be inset from, and the text starting
+     anywhere but the column's own edge would read as a stray indent. */
+  padding: 22px 0 9px;
+  border: 0;
+  border-bottom: 1px solid var(--q-line);
+  /* Both spelled out because iOS draws its own rounded, shaded field
+     otherwise, and a bevelled corner on a control with no box is the one place
+     the platform default is visible rather than merely different. */
+  border-radius: 0;
+  appearance: none;
+  background: transparent;
+  color: var(--q-ink);
+  font-family: inherit;
+  /* 16px is a floor, not a preference: below it iOS zooms the viewport on
+     focus and the visitor loses the form they were filling in. */
+  font-size: 16px;
+  line-height: 1.4;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* The placeholder is demoted, not deleted. At rest the label is standing in
+   its place, so showing both would be two greys saying different things in
+   the same line box; on focus the label has cleared the lane and the example
+   is the useful thing there. The text has to stay in the markup either way —
+   `:placeholder-shown` above is how the label knows the field is empty. */
+.quote__input::placeholder {
+  color: transparent;
+  transition: color 0.2s ease;
+}
+
+.quote__input:focus::placeholder {
+  color: var(--q-ink-quiet);
+}
+
+.quote__input:hover {
+  border-color: rgba(18, 18, 18, 0.24);
+}
+
+/* One line, and focus is that line getting stronger: gold, and doubled from
+   the inside by an inset shadow so it is 2px of contiguous colour on the
+   field's own edge rather than a ring hung off the outside of it.
+
+   The whole indicator now lives on a quarter of the perimeter it used to have,
+   so it is worth being explicit that it still clears the bar: against the
+   hairline it replaces, the focused rule is twice the weight and a different
+   hue at roughly 3:1 on the paper, on both pointer and keyboard. Weight and
+   colour together, because either alone on a single edge would be too quiet —
+   which is precisely why the old four-sided version could afford to be. */
+.quote__input:focus {
+  outline: none;
+  border-color: var(--q-gold);
+  box-shadow: inset 0 -1px 0 0 var(--q-gold);
+}
+
+.quote__input[aria-invalid='true'] {
+  border-color: var(--q-warn);
+}
+
+/* Focusing a field that is in error keeps the error's colour on both layers.
+   Without this the rule would be warn and the doubling gold, which is one line
+   in two tones. */
+.quote__input[aria-invalid='true']:focus {
+  box-shadow: inset 0 -1px 0 0 var(--q-warn);
+}
+
+/* Autofill, which is the one thing that can put a box back.
+
+   Chrome paints its own opaque background on a filled field and will not let
+   it be set — the only way past it is to flood the box with an inset shadow
+   large enough to cover it. That was survivable while the field had a fill of
+   its own; against a transparent one it is a blue rectangle sitting in a
+   column of rules, which is the entire look undone by the browser.
+
+   The focus variant lists the gold first on purpose: shadows paint in order,
+   first on top, so the rule has to come before the flood that would otherwise
+   bury it. */
+.quote__input:-webkit-autofill,
+.quote__input:-webkit-autofill:hover {
+  -webkit-text-fill-color: var(--q-ink);
+  -webkit-box-shadow: inset 0 0 0 100px var(--q-paper);
+}
+
+.quote__input:-webkit-autofill:focus {
+  -webkit-box-shadow: inset 0 -1px 0 0 var(--q-gold),
+    inset 0 0 0 100px var(--q-paper);
+}
+
+.quote__input--area {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.quote__error {
+  margin: 7px 0 0;
+  color: var(--q-warn);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* ------------------------------------------------------------
+   Submit
+   ------------------------------------------------------------ */
+
+.quote__submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 54px;
+  margin-top: 20px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 12px;
+  background: var(--q-ink);
+  color: #f5f1e8;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  /* Offset and blur, negative spread: contact with the paper, not a float. */
+  box-shadow: 0 14px 30px -18px rgba(60, 44, 20, 0.5);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.quote__submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: #000;
+  box-shadow: 0 20px 38px -26px rgba(120, 88, 40, 0.55);
+}
+
+.quote__submit:focus-visible {
+  outline: 2px solid var(--q-gold);
+  outline-offset: 3px;
+}
+
+.quote__submit:disabled {
+  cursor: progress;
+  background: var(--q-ink-soft);
+  box-shadow: none;
+}
+
+/* Empty until it says something, so the layout does not reserve a gap for a
+   message that is usually absent. */
+.quote__status:not(:empty) {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--q-field);
+  border: 1px solid var(--q-line);
+  color: var(--q-ink-soft);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.quote__alt {
+  margin: 20px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--q-line);
+  color: var(--q-ink-quiet);
+  font-size: 14px;
+}
+
+.quote__alt-link {
+  color: var(--q-ink);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid var(--q-gold);
+  padding-bottom: 1px;
+  transition: color 0.2s ease;
+}
+
+.quote__alt-link:hover {
+  color: var(--q-gold);
+}
+
+.quote__alt-link:focus-visible {
+  outline: 2px solid var(--q-gold);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ------------------------------------------------------------
+   Narrow
+   ------------------------------------------------------------
+
+   The photograph does not survive as a column here, and shrinking it to a
+   thin strip beside a form would make it decoration. It becomes a band above
+   the form instead — still the crew, still the thing being scheduled, just no
+   longer holding half the frame. */
+
+@media (max-width: 900px) {
+  /* The viewport cap comes off. Stacked, the picture and the form cannot
+     share one screen, and forcing them to would put the fields behind an
+     inner scrollbar on the device least able to cope with one. */
+  .quote__grid {
+    grid-template-columns: 1fr;
+    height: auto;
+    max-height: none;
+  }
+
+  .quote__panel {
+    overflow-y: visible;
+  }
+
+  /* A band rather than a column, and it has to be tall enough to hold the
+     heading and its paragraph as well as enough photograph to be worth
+     showing. The copy sets the floor; the picture takes whatever is left. No
+     distortion on this branch either — it is below the pointer gate. */
+  .quote__figure {
+    min-height: clamp(340px, 52svh, 460px);
+  }
+
+  .quote__panel {
+    padding: clamp(40px, 8vw, 64px) clamp(20px, 6vw, 48px)
+      clamp(56px, 10vw, 80px);
+  }
+
+  .quote__form-wrap {
+    max-width: 520px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quote__input,
+  .quote__input::placeholder,
+  .quote__submit,
+  .quote__alt-link {
+    transition: none;
+  }
+
+  /* The label still moves — it has to, it is where the field's name lives.
+     It just arrives at the two positions without travelling between them. */
+  .quote__label {
+    transition: none;
+  }
+
+  .quote__submit:hover:not(:disabled) {
+    transform: none;
+  }
+}

@@ -1,0 +1,146 @@
+/* ============================================================
+   Mobile and tablet navigation
+   ============================================================
+
+   Night ground and cream type, which is the footer's palette rather than the
+   hero's. The hero runs two modes and the menu opens over both, so borrowing
+   either one leaves it wrong half the time; taking the close of the page
+   instead gives it a ground of its own that neither mode argues with.
+
+   The panel is portalled to <body>, so nothing in the hero's cascade reaches
+   it and everything it needs is declared here. */
+
+.mobile-menu {
+  position: fixed;
+  inset: 0;
+  /* Above the navbar's own 40, and above the pinned sections further down. */
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  padding: 0 clamp(20px, 5vw, 44px) clamp(28px, 5vh, 48px);
+  background: #07080c;
+  color: #f3f0e7;
+  font-family: var(--font-body);
+  /* Its own scroll, for a short landscape phone where six display-size links
+     plus the action do not fit. The page behind is locked while this is up. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ------------------------------------------------------------
+   Bar
+   ------------------------------------------------------------
+
+   Repeats the navbar it covers, at the same height, so opening the menu reads
+   as the page turning over rather than as a sheet landing on top of it. */
+
+.mobile-menu__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 78px;
+  flex: none;
+}
+
+.mobile-menu__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #f3f0e7;
+}
+
+.mobile-menu__brand-name {
+  font-family: var(--font-accent);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.mobile-menu__close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  /* Pulled out to the panel's own edge so the glyph sits where the burger did
+     rather than 44px inboard of it. */
+  margin-right: -10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: #f3f0e7;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.mobile-menu__close:hover {
+  background: rgba(243, 240, 231, 0.1);
+}
+
+/* ------------------------------------------------------------
+   Links
+   ------------------------------------------------------------
+
+   Display size, not body size. There are six of them on an otherwise empty
+   screen, and setting them at 15px like the desktop bar would leave the panel
+   looking like a list that failed to load. */
+
+.mobile-menu__nav {
+  display: flex;
+  flex-direction: column;
+  /* Takes the slack, so the links sit in the middle of the panel on a tall
+     screen and pack from the top on a short one. */
+  flex: 1;
+  justify-content: center;
+  gap: clamp(4px, 1.4vh, 12px);
+  padding: clamp(24px, 5vh, 56px) 0;
+}
+
+.mobile-menu__link {
+  display: block;
+  padding: 6px 0;
+  font-family: var(--font-display);
+  font-size: calc(clamp(1.75rem, 7vw, 2.6rem) * var(--display-scale));
+  font-weight: calc(500 + var(--display-weight-delta));
+  line-height: 1.14;
+  letter-spacing: calc(var(--track-headline) + var(--display-tracking-delta));
+  color: #f3f0e7;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.mobile-menu__link:hover,
+.mobile-menu__link:focus-visible {
+  color: #d5b16a;
+}
+
+/* ------------------------------------------------------------
+   Action
+   ------------------------------------------------------------ */
+
+.mobile-menu__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  height: 56px;
+  border-radius: 12px;
+  background: #f4f1e8;
+  color: #0d0d0d;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  transition: filter 0.2s ease;
+}
+
+.mobile-menu__cta:hover {
+  filter: brightness(1.06);
+}
+
+/* The trigger is NOT styled here. It lives in the navbar and is styled in
+   styles.css alongside it — this file is imported by MobileMenu, so Vite
+   injects it after the global sheet, and an unconditional `display: none`
+   landing after styles.css's media query would win on document order at equal
+   specificity and keep the burger hidden at every width. */

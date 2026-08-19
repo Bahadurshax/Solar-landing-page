@@ -1,0 +1,1112 @@
+/* ============================================================
+   Solstice - Solar Energy Hero
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ------------------------------------------------------------
+   Typography tokens
+   ------------------------------------------------------------
+
+   Two families and three nudges. The nudges are deltas rather than absolute
+   values on purpose: the hero, the process cards and the case heading were
+   each tracked and weighted differently by hand, and a single absolute
+   `--display-tracking` would flatten those decisions into one number the
+   moment anything touched it. Adding an offset keeps the relationships and
+   moves the whole system together.
+
+   These are now the only place the faces are decided. The typography lab used
+   to overwrite the first two at runtime while it was being used to settle the
+   question; it has been taken off the page, so what is written here is what
+   ships and the three deltas below sit at their neutral values.
+
+   The deltas stay even with nothing left to drive them. Every display rule in
+   the section stylesheets reads them inside a calc(), and they are what makes
+   the whole system tunable from one place - worth keeping for the next time
+   the type needs moving, and not worth inlining into forty-odd rules now.
+
+   Albert Sans is a touch wider and rounder than the Geist it replaced, so the
+   display tracking is a shade tighter than it was - the same optical result,
+   not the same number. --font-accent is the brand name and nothing else. */
+:root {
+  /* ----------------------------------------------------------
+     Eclipse - the page's twelve colours
+     ----------------------------------------------------------
+
+     An audit found 65 distinct hex values in this project, 40 of them used
+     exactly once, and three separate neutral families running at the same
+     time: a true grey ramp, a warm near-black, and a cool near-black, all
+     doing the same job in different sections. These twelve replace all of it.
+
+     The scheme is near monochrome by choice. Bone against a true black, with
+     no chroma anywhere except one pale warm light. The photography is then the
+     only colour on the page, which is the whole idea: the page is a day
+     passing, and this lets the pictures be the thing that changes.
+
+     Two families, because the page has two hours. Warm-neutral for daylight,
+     the same near-black for night. Copy is never a token of its own below
+     these - secondary text is the ink or the lit at reduced alpha, so it keeps
+     the temperature of whatever it is sitting on.
+
+     Namespaced, and deliberately. Several sections already own a local `--ink`
+     or `--gold` that aliases down to these, and an alias cannot be written
+     `--ink: var(--ink)`. The prefix is what makes those one-line aliases
+     possible instead of a rename through every rule that reads them. */
+  --sol-paper: #f6f4ef;
+  --sol-ground: #edeae3;
+  --sol-sunk: #e4e0d7;
+  --sol-ink: #0b0b0c;
+
+  --sol-night: #0b0b0c;
+  --sol-night-panel: #141416;
+  --sol-night-deep: #050506;
+  --sol-lit: #f0ece2;
+
+  /* The one mark. On daylight it is a low, dry gold that barely separates from
+     the ink; on night it is light itself. Both are rationed to the single
+     active thing and never fill an area. */
+  --sol-accent: #8a7a4e;
+  --sol-accent-lit: #f5e9c8;
+
+  /* The only mid tone in the system. Hairlines and the lowest-contrast fills. */
+  --sol-dusk: #cfc9ba;
+
+  /* Semantic, and the only colour here that is allowed to mean something.
+     Required marks and validation, nothing decorative. */
+  --sol-warn: #8f3a1e;
+
+  --font-display: 'Albert Sans', system-ui, -apple-system, sans-serif;
+  --font-body: 'Albert Sans', system-ui, -apple-system, sans-serif;
+  --font-accent: 'Unbounded', 'Albert Sans', system-ui, sans-serif;
+
+  --display-weight-delta: 0;
+  --display-tracking-delta: 0em;
+  --display-scale: 1;
+
+  /* ----------------------------------------------------------
+     The page's two surfaces
+     ----------------------------------------------------------
+
+     One ground and one paper, for the whole document. Every daylight section
+     below the hero used to name its own: #f4f0e9, #f8f6f1, #f4efe4, #f7f4ec -
+     four creams for one job, differing by two or three points of luminance
+     each. A difference that small does not read as a decision. It reads as
+     four sections built at different times, which is exactly what it was, and
+     it is the single loudest reason the page felt assembled rather than
+     designed.
+
+     They are collapsed here. A section that genuinely needs to sit apart now
+     has to say so with a real step - the footer's near-black, the form panel's
+     paper - rather than by drifting a few points off its neighbour. */
+  --page-ground: var(--sol-ground);
+  --page-paper: var(--sol-paper);
+
+  /* ----------------------------------------------------------
+     Display tracking, as a ramp
+     ----------------------------------------------------------
+
+     Tracking should tighten as type grows - that part was right. What was
+     wrong is that it was doing so in seven ungoverned steps (-0.025, -0.03,
+     -0.035, -0.045, -0.055, -0.06), so two headings at the same size in
+     different sections were tracked differently for no reason anyone could
+     name. Three steps, tied to the role rather than to the section. */
+  --track-display: -0.055em;
+  --track-headline: -0.035em;
+  --track-title: -0.025em;
+
+  /* ----------------------------------------------------------
+     Running copy, as one number
+     ----------------------------------------------------------
+
+     Every paragraph on the page reads this. It used to be six numbers — the
+     hero strip at 15, the About lede at 16, its panels at 15, the cases lede
+     at 15, and two rules on the old Body clamp — which is the same drift the
+     surfaces had before they were collapsed into one ground and one paper.
+     Six sizes for one job, none of them chosen against the others.
+
+     It is also a step and a half up from where that clamp sat. Body copy was
+     running at 15.7px on a laptop and topping out at 17.3px, which is a size
+     that explains itself politely and expects to be skimmed. The page is a
+     photograph of a house with four sentences to say; the sentences should
+     carry at the same volume the pictures do.
+
+     17.3px on a phone, 19.4px at 1440, 20px from 1481 up. The floor is the
+     size, not a fallback — a paragraph that has to shrink to fit is a column
+     that is too narrow, and every rule that reads this is capped by a measure
+     in ch rather than by the viewport. */
+  --text-body: clamp(1.08rem, 1.35vw, 1.25rem);
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+/* Hold the scrollbar's space whether or not the scrollbar is there.
+
+   The film locks the page while its screen is open, and Lenis does that by
+   putting `overflow: clip` on this element. That stops the scrolling, and it
+   also takes the scrollbar away - which hands every layout box on the page an
+   extra 15-17px of width for exactly as long as the lock lasts, and takes it
+   back when the lock lifts. The whole page steps sideways twice per opening.
+
+   Most of it gets away with that, because most of it is centred copy moving
+   half a scrollbar and nobody is looking at the edges. The film does not:
+   `.film__media` is a `container-type: size` and the player inside it is sized
+   in `cqw`/`cqh`, and container units are resolved from layout, so they do not
+   interpolate and cannot be transitioned. The picture snapped to a new width
+   the instant the lock landed - once on the way in, once on the way out a
+   second later - in the middle of a 1000ms clip-path opening that was
+   otherwise perfectly smooth. That was the abrupt expand.
+
+   Reserving the gutter permanently means the lock changes nothing about the
+   width, so there is no step to see and nothing for the container units to
+   pick up. It costs a gutter on the rare view short enough not to scroll,
+   which on a page this long is close to none of them.
+
+   Fixing it here rather than at the film is deliberate: the film is where it
+   was visible, not where it came from. Anything else that ever reads its own
+   width - another container query, a canvas, a measured carousel - had the
+   same bug waiting for it. */
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  /* clip (not hidden) so the drifting card stage can't open a horizontal
+     scrollbar without turning the body into a scroll container. */
+  overflow-x: clip;
+  /* Was hard-coded to Inter while both sections below already ran on Geist, so
+     the hero was quietly a different typeface from the rest of the page. */
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Was #0b1220, which belonged to none of the page's surfaces. It is only
+     ever seen through overscroll, so it should be the darkest thing the page
+     has rather than a fourth night nobody chose. */
+  background: var(--sol-night-deep);
+}
+
+/* ------------------------------------------------------------
+   Mode-driven design tokens
+   ------------------------------------------------------------ */
+
+.hero {
+  --transition-color: 0.45s ease;
+
+  /* Live parallax state, written here by useHeroParallax as three unitless
+     numbers: cursor position across the hero on each axis (-1 to 1) and how
+     far the hero has scrolled away (0 to 1).
+
+     On the section rather than on the background it drives, because the
+     headline reads them too and it is a sibling of that wrapper, not a child.
+     This is the one element both of them are inside.
+
+     Declared with defaults so everything downstream resolves to a flat,
+     unmoved page when the effect never runs - reduced motion, or before the
+     first frame. */
+  --hp-x: 0;
+  --hp-y: 0;
+  --hp-scroll: 0;
+
+  /* How far the headline falls behind the page on its way out.
+
+     This is what carries the type into the roof. The house rises 96px as the
+     hero leaves and the gap between the headline and the roofline is about
+     117px, so the rise alone would still be short by the time the words had
+     left the screen. Sinking the headline as well closes the distance from
+     both ends, and it does it inside the stretch where the headline can still
+     be seen: at rest nothing overlaps, the roof reaches the last line about a
+     third of the way out, and the line is gone behind it before the hero is.
+
+     Read as scroll speed it is a lag rather than a slide - over one viewport
+     the headline travels about 60% of the distance the page does. */
+  --headline-sink: 300px;
+
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Morning tokens */
+.hero--morning {
+  --ui-text: var(--sol-ink);
+  --ui-text-muted: rgba(11, 11, 12, 0.72);
+  --cta-bg: var(--sol-ink);
+  --cta-text: var(--sol-ground);
+
+  /* The nav's travelling highlight, and the one white on the page. It is
+     strong on this hour because it has a bright photograph to hold itself
+     against, and because the link text here is ink — the whiter the veil, the
+     more the label sitting on it reads. Still short of solid: the bar is over a
+     photograph, and an opaque slab crossing it would be a chip of UI laid on
+     the picture rather than a light passing over it. */
+  --nav-veil: rgba(255, 255, 255, 0.55);
+
+  /* Both halves of the headline are now the system's two ends rather than a
+     brown and a cream. Over a photograph that is the only pairing with enough
+     separation to survive whatever is behind it. */
+  --headline-strong: var(--sol-ink);
+  --headline-soft: var(--sol-paper);
+  --headline-soft-shadow: 0 1px 18px rgba(0, 0, 0, 0.12);
+
+  --overlay: rgba(237, 234, 227, 0.1);
+
+  --toggle-bg: rgba(246, 244, 239, 0.3);
+  --toggle-border: rgba(11, 11, 12, 0.12);
+  --toggle-inactive-text: rgba(11, 11, 12, 0.82);
+  --toggle-active-bg: var(--sol-paper);
+  --toggle-active-text: var(--sol-ink);
+
+  --desc-text: rgba(11, 11, 12, 0.88);
+  /* Three shadows rather than one, and they are doing different jobs: a tight
+     core that holds each letterform's edge where it crosses a window frame, a
+     mid one for the ground immediately around the word, and a wide one that
+     lowers the whole area the line sits in. One 12px halo could do any of the
+     three but not all of them. Light, because the copy on this hour is ink. */
+  --desc-shadow: 0 1px 2px rgba(246, 244, 239, 0.85),
+    0 2px 10px rgba(237, 234, 227, 0.7), 0 0 30px rgba(237, 234, 227, 0.55);
+
+  /* Soft haze at the bottom (light behind the dark copy). Fades out low so it
+     stays a ground haze and doesn't creep up the page. */
+  --fog-gradient: linear-gradient(
+    to top,
+    rgba(237, 234, 227, 0.58) 0%,
+    rgba(237, 234, 227, 0.24) 38%,
+    rgba(237, 234, 227, 0) 66%
+  );
+}
+
+/* Night tokens */
+.hero--night {
+  --ui-text: var(--sol-lit);
+  --ui-text-muted: rgba(240, 236, 226, 0.78);
+  --cta-bg: var(--sol-lit);
+  --cta-text: var(--sol-night);
+
+  /* The same white at a third of the strength, and the alpha is doing
+     legibility rather than taste. The link text on this hour is Cool Lit, so a
+     veil carrying the morning's 0.55 would put a pale label on a pale slab and
+     erase the word it is there to mark. At 0.18 it still reads as white light
+     on the night sky, and the type stays well clear of it. */
+  --nav-veil: rgba(255, 255, 255, 0.18);
+
+  /* The one place the accent carries display type, and the reason it exists:
+     on night it is light rather than gold, so the loud half of the headline
+     reads as lit instead of coloured. */
+  --headline-strong: var(--sol-accent-lit);
+  --headline-soft: var(--sol-night);
+  /* Near-black on a dark sky needs a soft light halo to stay legible. */
+  --headline-soft-shadow: 0 0 22px rgba(245, 233, 200, 0.42),
+    0 1px 2px rgba(245, 233, 200, 0.28);
+
+  --overlay: rgba(5, 5, 6, 0.3);
+
+  --toggle-bg: rgba(11, 11, 12, 0.44);
+  --toggle-border: rgba(240, 236, 226, 0.14);
+  --toggle-inactive-text: rgba(240, 236, 226, 0.86);
+  --toggle-active-bg: var(--sol-lit);
+  --toggle-active-text: var(--sol-night);
+
+  --desc-text: rgba(240, 236, 226, 0.82);
+  --desc-shadow: 0 1px 2px rgba(0, 0, 0, 0.75),
+    0 2px 10px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 0, 0, 0.45);
+
+  /* Low-lying mist, lighter than the sky so it reads as fog. Warm rather than
+     blue now: there is no blue anywhere else in the scheme, and one section
+     inventing a hue is how the old palette got to 65 values. */
+  --fog-gradient: linear-gradient(
+    to top,
+    rgba(240, 236, 226, 0.2) 0%,
+    rgba(240, 236, 226, 0.09) 42%,
+    rgba(240, 236, 226, 0) 100%
+  );
+}
+
+/* ------------------------------------------------------------
+   Background layers
+   ------------------------------------------------------------ */
+
+/* Holds both halves of the photograph and sorts neither. Positioned so the
+   layers inside have something to fill, and given no z-index on purpose: with
+   one it would become a stacking context and the house could never climb past
+   the headline, which is a sibling of this element rather than a child.
+
+   It is also where the parallax state lives, because both layers have to read
+   the same numbers and this is the only thing they share. */
+.hero__depth {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  /* How far each plane travels, and the whole parallax in four numbers.
+
+     On the cursor the near plane simply out-travels the far one: coming toward
+     you, a nearer object sweeps further across the frame.
+
+     On the scroll they move in opposite directions. The far plane falls behind
+     the page and sinks; the house climbs against it, so the roofline lifts off
+     the treeline as the hero goes by. Both halves of that are deliberate - the
+     house rising on its own would read as the whole picture drifting, and the
+     separation is what makes it read as depth.
+
+     These can be pushed much harder than the masked version they replaced. The
+     planes are now two different pictures rather than one picture twice, so
+     there is no seam between them to give way - the limit is the bleed below
+     and the composition, not the technique. */
+  --depth-near-shift: 26px;
+  --depth-far-shift: 10px;
+  --depth-near-rise: 96px;
+  --depth-far-lag: 44px;
+
+  /* The far plane is the out-of-focus one, and it is most of what sells the
+     house as a separate object rather than part of the same picture. There is
+     no variable for it any more: the defocus lives in the back plate's own
+     pixels now, for the reasons set out above `.background-plate--back`. */
+
+  /* How tall the house stands in the frame, and the one number that decides
+     the composition.
+
+     It is a height rather than a width because the two cutouts are trimmed to
+     their own content and are not the same shape - 2138x736 for the day, and
+     2011x782 for the night. Sized by width they would stand at noticeably
+     different heights and the house would change size when the toggle was
+     thrown, which is exactly what the drop transition exists to avoid. Sized
+     by height they match, and each is simply as wide as it happens to be.
+
+     It also survives the viewport changing shape. A phone holds the hero in
+     portrait, where a width-based figure would shrink the house to a strip
+     along the bottom; against the height it keeps its footing and runs off the
+     sides instead, which is what the flat photograph's `cover` used to do. */
+  --house-height: 60%;
+}
+
+/* The two halves, and the headline sits between them.
+
+   This is the whole depth effect: the lot is painted, then the type, then the
+   house over the top of it, so the roofline crosses the last line of the
+   headline and the words carry on behind it. Type laid over a photograph is
+   always obviously in front of it; type that something in the photograph
+   passes across is in the scene.
+
+   25 is chosen against the rest of the hero rather than picked large. The
+   headline is 20, the toggle and its paragraph are 30 and the navigation is
+   40 - so the house covers the words and nothing else. Losing the controls
+   behind it would be trading a legible interface for a trick. */
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero__bg--behind {
+  z-index: 0;
+}
+
+.hero__bg--front {
+  z-index: 25;
+}
+
+/* ------------------------------------------------------------
+   Hero depth
+   ------------------------------------------------------------
+
+   Two planes, and the hero composition is the arrangement of them rather than
+   anything that exists in a file:
+
+   back   an empty lot - sky, treeline, fence, lawn and driveway, with no house
+          on it. Fills the frame, softened, and sinks as the hero scrolls away.
+   front  the house on transparency, carrying its own planting beds, driveway
+          and the ground it stands on. Stood on the floor of the frame, and it
+          climbs.
+
+   They share no pixels, which is the whole point and the reason the amplitudes
+   above can be what they are. An earlier version faked the split out of the
+   flat photograph with an elliptical mask, and every pixel inside that ellipse
+   existed on both planes - so any real separation showed up as a double
+   exposure and the movement had to stay too small to be worth having.
+
+   The two are sized and anchored by completely different rules, which is the
+   part worth understanding. The back plate is wallpaper: it covers the frame
+   and its own framing does not matter much. The front plate is an object: it
+   has a height, it stands on the floor, and everything about where it sits is
+   deliberate. Nothing about the pair needs to line up, because they were never
+   the same picture - they only need to look like one lot.
+
+   Each carries bleed on the side it travels toward. Without it the house's
+   rise would pull a bare strip up from the bottom of the frame and the back
+   plate's sink would drop one in from the top.
+
+   No `will-change` on either, for the reason given above `.background-layer`:
+   these are full-viewport plates carrying a two-megabyte photograph. It would
+   also be redundant - the back plate carries a filter and the front one an
+   alpha channel, and both already earn a compositor layer without being asked.
+
+   `lag` and `pin` below are single-plane behaviours being compared against
+   this one; they run on the flat original and go once one is chosen. */
+.background-plate {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  pointer-events: none;
+}
+
+/* ---- lift: the two planes come apart ---- */
+
+/* Anchored to the bottom, not the middle. What matters in this plate is where
+   the treeline meets the lawn, because that is the line the house stands on;
+   centred, a change of viewport shape would slide that horizon up and down
+   behind a house that had not moved. The overhang is at the top, which is the
+   direction it travels and also the part that is only sky. */
+/* The defocus is in the file, not in a filter.
+
+   It used to be `filter: blur(var(--depth-blur))`, and that one declaration was
+   the most expensive thing on the page. A filtered element cannot be drawn
+   straight to the screen — it goes to an offscreen buffer first — and during a
+   morning/night swap there are two of these alive at once, each a full-viewport
+   photograph, each re-run through that buffer on every frame of the drop. It
+   measured at eleven frames in the 1200ms of a toggle. With the filter gone and
+   nothing else changed, thirty.
+
+   Radius had nothing to do with it: blur(2px) measured the same as blur(7px).
+   It is the presence of a filter that costs, not the amount, which is also why
+   turning the blur down was never going to be the fix. Promotion hints did not
+   help either - will-change on the plate, on the layer, contain: paint, all of
+   them landed within noise of the control.
+
+   So the blur is baked into the two back plates instead. It was never a dynamic
+   value; it was a constant being recomputed sixty times a second for the life
+   of the session. Baking it also made the files small - a defocused image has
+   no fine detail left to store, so they ship at 960px wide and 35KB and 17KB
+   against 724KB and 553KB for the sharp originals, and `cover` scales them back
+   up with nothing to lose.
+
+   What is given up is the ability to tune the defocus from here. The radius is
+   now a property of the asset: it was baked at roughly 5px in the source's own
+   1376px space, which is what 7px of CSS blur came to once the cover scale was
+   divided out, and it drifts by a pixel or so across viewport shapes because a
+   baked blur scales with the image where a CSS one does not. That is invisible
+   on something whose whole job is to be out of focus. To change it, regenerate
+   the plates from the sharp originals next to them rather than reaching for a
+   filter here. */
+.background-plate--back {
+  inset: -9% 0 0 0;
+  background-position: center bottom;
+  transform: translate3d(
+    calc(var(--hp-x) * var(--depth-far-shift)),
+    calc(
+      var(--hp-y) * 0.6 * var(--depth-far-shift) + var(--hp-scroll) *
+        var(--depth-far-lag)
+    ),
+    0
+  );
+}
+
+/* Stood on the floor of the frame at a fixed height, and left to be as wide as
+   that makes it.
+
+   The box hangs half the rise below the fold so the plate has ground to climb
+   out of. Rising off a flush bottom edge would drag the cut line where the
+   house's own driveway ends up into the frame, and a straight horizontal seam
+   across the lawn is the one artifact in this whole effect that reads as a
+   mistake rather than as distance. Half rather than all of it: the full
+   overhang would hold the house that much lower for the whole of the time
+   anyone is actually looking at the hero, to buy a cleaner edge at the end of
+   the scroll that almost nobody reaches. */
+.background-plate--front {
+  inset: 0 0 calc(var(--depth-near-rise) * -0.5) 0;
+  background-size: auto var(--house-height);
+  background-position: center bottom;
+  transform: translate3d(
+    calc(var(--hp-x) * var(--depth-near-shift)),
+    calc(
+      var(--hp-y) * 0.6 * var(--depth-near-shift) - var(--hp-scroll) *
+        var(--depth-near-rise)
+    ),
+    0
+  );
+}
+
+/* No will-change here. This is a full-viewport layer carrying a two-megabyte
+   photograph, and it moves only when someone clicks the morning/night toggle -
+   a promise that is worth keeping for the ~600ms of the drop and worth nothing
+   for the rest of the session, during which it costs a permanently resident
+   compositor layer the size of the screen. Motion promotes the element while
+   it is actually animating `y` and releases it on settle, which is the whole
+   behaviour the static declaration was approximating badly. */
+.background-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  pointer-events: none;
+}
+
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: var(--overlay);
+  transition: background var(--transition-color);
+}
+
+/* Both bottom hazes sit above the house rather than behind it.
+
+   They are what the toggle and its paragraph are legible against, and once the
+   house moved in front of the headline it was also in front of these - leaving
+   dark copy sitting on a sunlit lawn and a bright driveway with nothing in
+   between. Above the house they cover the same ground they always did.
+
+   They stay clear of the headline for free: both are anchored to the bottom
+   and neither reaches higher than 48% of the frame, while the headline ends
+   above that. The house is the only thing in the hero that crosses the type,
+   which is the point of it. */
+.hero__bottom-gradient {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 42%;
+  z-index: 26;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.16) 60%,
+    rgba(0, 0, 0, 0.34) 100%
+  );
+}
+
+/* Fog. A full-viewport blur layer framing the edges - heavy at the bottom,
+   feathered up the left and right sides, clear through the center where the
+   headline lives. Sits above the background but below the interface content,
+   so the image behind the copy is hazed while the text stays crisp. A soft
+   mode-tinted haze on top makes the diffusion read as fog rather than a plain
+   frosted panel. The radial mask ramps the blur in gradually for the drift. */
+.hero__fog {
+  position: absolute;
+  /* Bottom-only haze. A plain tinted gradient - no backdrop-filter - so it
+     costs nothing per frame and stays smooth during the background drop.
+     Fades from a solid mode-tinted haze at the bottom up to transparent.
+
+     A backdrop-filter was tried here and taken out again. It looked right —
+     the floor of the picture going soft reads as depth of field rather than as
+     an overlay — but blur is paid by the pixel, and this band is the width of
+     the frame sitting over the one thing on the page that moves under the
+     cursor. Measured against the hero's own parallax it multiplied the frame
+     time by three to four. The paragraph's legibility is carried by the halo
+     on its letterforms instead, which costs nothing and cannot smear. */
+  inset: auto 0 0 0;
+  height: 52%;
+  z-index: 26;
+  pointer-events: none;
+  background: var(--fog-gradient);
+}
+
+/* ------------------------------------------------------------
+   Navbar
+   ------------------------------------------------------------ */
+
+.navbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 78px;
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  z-index: 40;
+}
+
+.navbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--ui-text);
+  transition: color var(--transition-color);
+}
+
+.navbar__logo {
+  flex: none;
+  color: var(--ui-text);
+  transition: color var(--transition-color);
+}
+
+/* The accent face, and the only place in the header it appears. Unbounded is
+   drawn much wider than Albert Sans at the same size, so this steps down a
+   couple of points and loses the negative tracking - the face is already
+   spaced the way it wants to be, and pulling it tighter just collides the
+   round bowls it is built out of. */
+.navbar__brand-name {
+  font-family: var(--font-accent);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* The frame the travelling veil measures itself against, and the reason this
+   is positioned. Its height is the links' height — the veil is out of flow, so
+   there is nothing else in here to set it — which is what lets the veil take
+   `inset-block: 0` instead of a magic number that would drift the first time
+   the link padding changed. */
+.navbar__nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  /* Most of the space between the links moved into their own padding, so the
+     veil has a box to fill rather than hugging the glyphs. The two together
+     hold the text roughly where the old gap alone had it — about 29px apart at
+     the narrow end of the desktop range and 39px at the wide one, against 27
+     and 38 before — which matters because the bar is only ~46px from running
+     out of room at 1025px. */
+  gap: clamp(4px, 0.6vw, 12px);
+}
+
+/* ------------------------------------------------------------
+   The magnetic veil
+   ------------------------------------------------------------
+
+   One highlight shared by six links, driven from Navbar.jsx — the reasoning for
+   the springs, the cursor lean and the velocity stretch is there, on the
+   constants. What lives here is only what it looks like.
+
+   No hairline on it, deliberately. The veil is laid out at one width and
+   scaled to each link, and a 1px border is the one thing that would make that
+   scaling visible: the vertical edges would sit at different weights from the
+   horizontal ones, and the round ends would show their stretch. A fill has
+   nothing to give away.
+
+   A pill rather than a soft rectangle, which is the roundness rule doing its
+   job rather than breaking it — this marks the thing under the cursor, and
+   these are things you act on. */
+.navbar__veil {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 0;
+  border-radius: 999px;
+  background: var(--nav-veil);
+  /* The scale is a width, so it has to grow from the same edge the position is
+     measured to. Centre origin would put every link's veil half a link to the
+     left of it. */
+  transform-origin: left center;
+  pointer-events: none;
+  opacity: 0;
+  /* Fades, never travels, on arrival and release: the position is a spring and
+     the opacity is not, so the veil can appear where it is needed without
+     sliding in from wherever it was last parked. */
+  transition: opacity 0.22s ease, background var(--transition-color);
+}
+
+.navbar__nav[data-magnet='on'] .navbar__veil {
+  opacity: 1;
+}
+
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* The menu trigger. Styled here rather than in mobile-menu.css so it sits in
+   the same sheet as the media query that reveals it - that file is imported by
+   the component and injected after this one, where an unconditional
+   `display: none` would outrank the query on document order and hide the
+   burger at every width. */
+.navbar__burger {
+  display: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  /* Pulls the glyph out to the bar's padding edge, so it optically aligns with
+     the gutter rather than sitting 44px inboard of it. */
+  margin-right: -10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ui-text);
+  cursor: pointer;
+  transition: color var(--transition-color), background 0.2s ease;
+}
+
+.navbar__burger:hover {
+  background: rgba(128, 128, 128, 0.14);
+}
+
+/* Positioned so it paints above the veil. Without it the links are static
+   inline content and the veil is a positioned box, which puts the veil's fill
+   over the words rather than under them. */
+.navbar__link {
+  position: relative;
+  z-index: 1;
+  /* The box the veil fills. It is also the hit area, and it is now the whole
+     highlight rather than the six glyph-widths it used to be, so the cursor
+     hands the veil over at the halfway point between two links instead of
+     letting it drop halfway across the gap. */
+  padding: 8px clamp(9px, 0.9vw, 16px);
+  border-radius: 999px;
+  /* One step up the interface ramp — 15px, the Control step, which is where
+     these sat in spirit once they gained a pill behind them: they are read as
+     controls now rather than as a line of secondary text. It is also the last
+     step available. 16px is the Field size, it belongs to text the visitor
+     types into, and it would put these links above the CTA's own 14px label,
+     which inverts the one hierarchy this bar has.
+
+     The extra point costs about 29px across six labels and the bar had 21px
+     of room left at 1025px, so the padding and the gap above give some back —
+     both a shade tighter than they were, which the larger type absorbs. */
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--ui-text);
+  opacity: 0.9;
+  transition: color var(--transition-color), opacity 0.2s ease;
+}
+
+.navbar__link:hover {
+  opacity: 1;
+}
+
+/* The label's own element, so the cursor lean can move the words without
+   moving the box around them. The transition is the smoothing: Navbar writes
+   `--nav-lean` raw on every pointer move, and this is what turns a value that
+   jumps with the cursor into one that trails it. */
+.navbar__link-label {
+  display: inline-block;
+  transform: translate3d(var(--nav-lean, 0px), 0, 0);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* An anchor now rather than a button, so the box has to be built rather than
+   assumed: `height` does nothing to an inline element, and the label would sit
+   on the baseline instead of centred. */
+.navbar__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  padding: 0 28px;
+  border: none;
+  border-radius: 11px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  background: var(--cta-bg);
+  color: var(--cta-text);
+  transition: background var(--transition-color), color var(--transition-color),
+    transform 0.18s ease, filter 0.18s ease;
+}
+
+/* The hero sits on a photograph, where the user-agent ring is frequently
+   invisible. This is the page's primary action; it does not get to be the
+   control a keyboard user loses. */
+.navbar__cta:focus-visible {
+  outline: 2px solid var(--cta-bg);
+  outline-offset: 3px;
+}
+
+.navbar__cta:hover {
+  transform: scale(1.04);
+  filter: brightness(1.08);
+}
+
+.navbar__cta:active {
+  transform: scale(0.98);
+}
+
+.navbar__cta-short {
+  display: none;
+}
+
+/* ------------------------------------------------------------
+   Headline
+   ------------------------------------------------------------ */
+
+.headline {
+  position: absolute;
+  /* Where it has always been: clear of the roof, whole, against open sky. The
+     depth is something the scroll does, not something the composition pays for
+     up front. */
+  top: 20%;
+  left: 0;
+  right: 0;
+
+  /* The sink, and it is `translate` rather than `transform` on purpose. Motion
+     owns this element's inline `transform` for the entrance - the note below
+     about centring is the same problem - but `translate` is a separate
+     property that composes with it instead of being overwritten by it. The two
+     animations can share the element without either having to know about the
+     other.
+
+     Measured against the cutout rather than guessed: across the width of the
+     headline the roof runs at about 52% of the frame and lifts to 48.5% over
+     the raised array, while the second line ends around 39.6%. Nothing touches
+     at rest. Then the house climbs, this falls, and the ridge crosses the last
+     line about a third of the way through the hero's exit. */
+  translate: 0 calc(var(--hp-scroll) * var(--headline-sink));
+  /* Center horizontally via auto margins instead of transform - Framer
+     Motion owns the inline `transform` for the y entrance animation, so a
+     CSS translateX here would be overwritten and push the block off-center. */
+  margin-inline: auto;
+  width: min(92%, 920px);
+  z-index: 20;
+
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: calc(500 + var(--display-weight-delta));
+  font-size: calc(clamp(3.5rem, 5.8vw, 6rem) * var(--display-scale));
+  line-height: 0.95;
+  letter-spacing: calc(var(--track-display) + var(--display-tracking-delta));
+}
+
+.headline__line {
+  display: block;
+}
+
+.headline__strong {
+  color: var(--headline-strong);
+  transition: color var(--transition-color);
+}
+
+.headline__soft {
+  color: var(--headline-soft);
+  transition: color var(--transition-color), text-shadow var(--transition-color);
+  text-shadow: var(--headline-soft-shadow);
+}
+
+/* ------------------------------------------------------------
+   Bottom controls
+   ------------------------------------------------------------ */
+
+.hero__bottom {
+  position: absolute;
+  left: 50%;
+  bottom: 92px;
+  transform: translateX(-50%);
+  width: min(100%, 760px);
+  padding: 0 20px;
+  z-index: 30;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Segmented toggle */
+.toggle {
+  position: relative;
+  width: 400px;
+  max-width: calc(100vw - 40px);
+  height: 70px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--toggle-bg);
+  border: 1px solid var(--toggle-border);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: background var(--transition-color),
+    border-color var(--transition-color);
+}
+
+.toggle__option {
+  position: relative;
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--toggle-inactive-text);
+  transition: color var(--transition-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle__option:disabled {
+  cursor: default;
+}
+
+.toggle__option:focus-visible {
+  outline: 2px solid var(--sol-accent-lit);
+  outline-offset: -3px;
+  border-radius: 8px;
+}
+
+/* Two elements, because two different animations want this rectangle. The
+   outer one is the shared layout element that slides between the halves, and
+   Motion owns its transform for that. The squash on arrival has to happen
+   somewhere that is not fighting the projection, so the visible fill moved a
+   level down and the outer box became pure positioning. */
+.toggle__indicator {
+  position: absolute;
+  inset: 4px;
+  z-index: 0;
+}
+
+.toggle__indicator-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background: var(--toggle-active-bg);
+}
+
+.toggle__option--active {
+  color: var(--toggle-active-text);
+}
+
+.toggle__labels {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  line-height: 1.1;
+}
+
+.toggle__label {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.toggle__sub {
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+/* Supporting description */
+.hero__description {
+  max-width: 720px;
+  margin: 16px auto 0;
+  text-align: center;
+  font-size: var(--text-body);
+  /* Opened up from 1.5. Two things need the room: body size is three points
+     larger than it was, and the wash below is painted per line — at 1.5 the
+     lines' washes met and the overlap read as a solid bar. */
+  line-height: 1.7;
+  color: var(--desc-text);
+  text-shadow: var(--desc-shadow);
+  transition: color var(--transition-color), text-shadow var(--transition-color);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    height: 64px;
+    padding: 14px 16px;
+  }
+
+  .navbar__cta {
+    height: 46px;
+    padding: 0 18px;
+  }
+
+  .navbar__cta-full {
+    display: none;
+  }
+
+  .navbar__cta-short {
+    display: inline;
+  }
+
+  .headline {
+    top: 30%;
+    width: min(94%, 620px);
+    font-size: calc(clamp(2.4rem, 10vw, 4rem) * var(--display-scale));
+  }
+
+  /* No sink here, because there is nothing for it to sink into. A portrait
+     frame stands the house as a band along the bottom with its roof around
+     two thirds of the way down, far below where the headline ends, and the
+     distance is more than the whole effect has to spend. Left in, all it would
+     do is drift the title down the screen on the way out for no payoff.
+     The stacking order still holds - the house is still in front - the two
+     simply never cross. */
+  .hero {
+    --headline-sink: 0px;
+  }
+
+  .hero__bottom {
+    bottom: 74px;
+  }
+
+  /* The one paragraph allowed under the page's body size, and only here. This
+     strip is centred on a photograph between the toggle and the bottom of a
+     portrait frame, and at the full size it takes four lines of that frame.
+     Still two points up from the 13px it was. */
+  .hero__description {
+    font-size: 15px;
+  }
+
+  /* Scaled down with the frame. A portrait hero shows a much narrower slice of
+     the lot, so the same pixel offsets land as a far larger share of what is
+     left of it - and the cursor half of the effect is off here anyway, leaving
+     the scroll to carry the depth on its own.
+
+     The house stands lower as well. At the desktop height it fills a portrait
+     frame edge to edge and the treeline it is supposed to be standing in front
+     of never gets a look in. */
+  .hero__depth {
+    --depth-near-rise: 42px;
+    --depth-far-lag: 22px;
+    --depth-blur: 4px;
+    --house-height: 42%;
+  }
+}
+
+/* ------------------------------------------------------------
+   Reduced motion
+   ------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .background-layer {
+    will-change: auto;
+  }
+
+  /* No lean, and nothing to smooth. */
+  .navbar__link-label {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* What the links do when the veil is not there to do it for them — reduced
+   motion, or a pointer that cannot hover, in which case Navbar renders no veil
+   at all. The mark itself is not the decoration; the travelling is. So the same
+   veil colour lands as a plain hover fill on the link's own box, and nothing
+   about which link is under the cursor is lost.
+
+   Not a fallback for narrow viewports, though: below 1025px these six links are
+   inside the burger panel and there is no bar for any of this to happen in. */
+@media (prefers-reduced-motion: reduce), (hover: none) {
+  .navbar__link:hover {
+    background: var(--nav-veil);
+  }
+}
+

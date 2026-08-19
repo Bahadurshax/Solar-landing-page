@@ -1,0 +1,696 @@
+/* ============================================================
+   The close
+   ============================================================
+
+   The page's last three sections stack the way every other section stacks.
+
+   There used to be a stage here: one screen with its overflow clipped, holding
+   the testimonial wall at the top while the footer was brought up from below
+   the bottom edge and lifted the wall out through the top. The clip is what
+   made the bottom of the screen behave like a real edge for the footer to
+   arrive from, and the whole construction existed so the footer would read as
+   displacing something rather than as the next thing down.
+
+   It is gone, and with it the stage, the lift, the pinned timeline and the
+   `data-pushing` promotion flag. The reason is structural rather than a change
+   of mind about the effect: the stage was exactly one screen and the wall
+   filled it, so there was no in-flow slot between the testimonials and the
+   footer for anything to occupy. The partners band needed that slot. */
+
+.closing {
+  position: relative;
+  background: var(--page-ground);
+}
+
+/* ------------------------------------------------------------
+   Footer
+   ------------------------------------------------------------ */
+
+.site-footer {
+  /* The edge itself. Shared, so the strip above and any future use of it
+     cannot drift apart. */
+  --f-edge: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1900 90' preserveAspectRatio='none'%3E%3Cpath d='M0 0H275C322 0 350 90 400 90H1500C1550 90 1578 0 1625 0H1900V90H0Z' fill='%23000'/%3E%3C/svg%3E");
+
+  --f-ink: var(--sol-lit);
+  --f-ink-soft: rgba(240, 236, 226, 0.62);
+  --f-ink-faint: rgba(240, 236, 226, 0.34);
+  --f-line: rgba(240, 236, 226, 0.12);
+  --f-gold: var(--sol-accent-lit);
+
+  /* How far the middle of the top edge sits below the two outer ends. Lives on
+     the footer rather than on the body because the shaped strip and the plate
+     below it both measure from it and have to agree exactly. */
+  --f-notch: clamp(26px, 3.4vw, 66px);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  color: var(--f-ink);
+  font-family: var(--font-body);
+}
+
+/* ------------------------------------------------------------
+   The top edge
+   ------------------------------------------------------------
+
+   The shape from the reference: level at both outer ends, easing down through
+   a pair of mirrored curves to a long flat run across the middle.
+
+   It is drawn as a strip exactly as tall as the notch, painted in the plate's
+   own colour and butted against the top of the plate, so what the reader sees
+   is one continuous surface with a shaped top edge rather than a shape sitting
+   on top of a rectangle. Below this strip the plate is an ordinary rectangle.
+
+   That split is a performance decision, and it is worth stating plainly
+   because the obvious construction is the slow one. Masking the whole body
+   and casting the shadow with a `filter` on the whole footer both work, and
+   both put a full-width, page-tall subtree into an offscreen buffer that has
+   to be re-rastered and re-blurred rather than left as a cheap composited
+   layer — which is felt as stutter while scrolling the bottom of the page.
+   Confined to a strip a few dozen pixels tall, the same two operations cost
+   nothing measurable.
+
+   The path is drawn in a 1900x90 box and stretched with
+   `preserveAspectRatio='none'`, so nothing about the shape is pinned to one
+   screen width: the strip's height fixes the depth of the notch in real
+   pixels, and the curves and the flat middle share out the width in
+   proportion at any size. */
+
+.site-footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--f-notch);
+  background: var(--sol-night-panel);
+
+  -webkit-mask-image: var(--f-edge);
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-image: var(--f-edge);
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+
+  /* Cast upward, onto the section above it. This is the page's largest tonal
+     step, cream to near-black in one edge, and it is the last thing left of
+     the arrival the push used to stage: the section above darkens slightly
+     where the footer meets it, so the eye reads an object laid over the page
+     rather than one background exchanged for another. Warm, per the rule that
+     no shadow is neutral, and wide enough to be a gradient rather than a line.
+
+     A `filter` rather than a `box-shadow` because the edge is not straight: a
+     box shadow is drawn from the border box and would hang a level line across
+     the notch, giving the shape away, where `drop-shadow` is drawn from the
+     rendered alpha and follows the curve down and back up on its own. It is
+     affordable here only because it is this strip's alpha being blurred and
+     not the whole footer's. */
+  filter: drop-shadow(0 -20px 30px rgba(28, 20, 8, 0.3));
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------
+   Body
+   ------------------------------------------------------------
+
+   A straight top edge, and a plain block. The body used to be `flex: 1` inside
+   a footer that was absolutely positioned against a clipped stage; with the
+   stage gone it is simply the thing the footer paints, and it still clips
+   because the monument overflows its bottom edge on purpose. */
+
+.site-footer__body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* Starts at the bottom of the notch, where the shaped strip above it ends.
+     The 1px is an overlap rather than a gap: two boxes that meet on a
+     fractional device pixel show a hairline of whatever is behind them, and
+     behind them here is cream. */
+  margin-top: calc(var(--f-notch) - 1px);
+  /* The monument is set to overflow the bottom of this box and is clipped by
+     it, which is the entire effect. */
+  overflow: hidden;
+  background: var(--sol-night-panel);
+}
+
+/* ------------------------------------------------------------
+   The frames
+   ------------------------------------------------------------
+
+   Three rounded rectangles at a hairline, each one much larger than the
+   footer and anchored off a different edge, so what shows on the plate is
+   only the corner of each. That is the whole trick: a corner radius this
+   large reads as architecture, where a whole visible box reads as a card.
+
+   Opacity is the entire design decision here. These sit under type at every
+   size from 12px legal to the monument, and a stroke bright enough to notice
+   on its own is a stroke that cuts through a word somewhere on some viewport. */
+
+.site-footer__frames {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.site-footer__frame {
+  position: absolute;
+  border: 1px solid rgba(240, 236, 226, 0.07);
+  border-radius: clamp(80px, 9vw, 190px);
+}
+
+/* Down from the top edge, off to the left: its corner cuts across the space
+   beside the closing line. */
+.site-footer__frame--a {
+  top: -18%;
+  left: -22%;
+  width: 62%;
+  height: 96%;
+}
+
+/* The mirror, held lower, so the two corners frame the centred call rather
+   than sitting at the same height and reading as a pair of brackets. */
+.site-footer__frame--b {
+  top: 6%;
+  right: -26%;
+  width: 58%;
+  height: 108%;
+}
+
+/* Comes up from the bottom and crosses the directory band. Wider than the
+   frame itself, so only its two top corners ever show. */
+.site-footer__frame--c {
+  left: -8%;
+  right: -8%;
+  bottom: -62%;
+  height: 108%;
+}
+
+/* ------------------------------------------------------------
+   Body
+   ------------------------------------------------------------ */
+
+.site-footer__inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: clamp(34px, 5.6vh, 72px) clamp(24px, 4.4vw, 64px) 0;
+}
+
+/* ------------------------------------------------------------
+   The call
+   ------------------------------------------------------------
+
+   Centred, and the only centred type on the page. Everything else is set to a
+   left edge because it is being read; this is being said. */
+
+.site-footer__call {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(22px, 3.2vh, 40px);
+  padding-bottom: clamp(34px, 5.6vh, 74px);
+}
+
+/* Sentence case, not the shout it used to be. Centred display type at this
+   size is loud enough on its own, and uppercase on two centred lines turns a
+   ragged edge into a wall.
+
+   Tracked at the display step now that the letters have lowercase forms to
+   close up again. */
+.site-footer__line {
+  margin: 0;
+  max-width: 16ch;
+  font-family: var(--font-display);
+  font-size: calc(clamp(2.3rem, 4.8vw, 4.8rem) * var(--display-scale));
+  font-weight: calc(500 + var(--display-weight-delta));
+  line-height: 0.98;
+  letter-spacing: calc(var(--track-display) + var(--display-tracking-delta));
+  color: var(--f-ink);
+}
+
+.site-footer__seal {
+  display: inline-grid;
+  place-items: center;
+  width: 0.34em;
+  aspect-ratio: 1;
+  margin-left: 0.14em;
+  vertical-align: 0.04em;
+  border-radius: 50%;
+  border: 1px solid rgba(243, 240, 231, 0.4);
+}
+
+.site-footer__seal-mark {
+  width: 52%;
+  color: var(--f-ink);
+}
+
+/* The one filled control in the footer, and it goes to the estimate rather
+   than back up the page: the way out of a footer that matters is forward.
+   Set in the same tracked caps as the column titles below it, so the button
+   and the headings over the link lists read as one voice. */
+.site-footer__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 22px;
+  border: 1px solid rgba(240, 236, 226, 0.16);
+  border-radius: 12px;
+  background: rgba(240, 236, 226, 0.07);
+  color: var(--f-ink);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.22s ease, border-color 0.22s ease,
+    transform 0.22s ease;
+}
+
+.site-footer__cta:hover {
+  background: rgba(240, 236, 226, 0.12);
+  border-color: rgba(240, 236, 226, 0.3);
+  transform: translateY(-1px);
+}
+
+.site-footer__cta-icon {
+  display: grid;
+  place-items: center;
+  color: var(--f-gold);
+  transition: transform 0.22s ease;
+}
+
+.site-footer__cta:hover .site-footer__cta-icon {
+  transform: translateX(3px);
+}
+
+/* ------------------------------------------------------------
+   The directory
+   ------------------------------------------------------------
+
+   A rule above it, because the call and the directory are two different kinds
+   of thing and a full-width hairline is the cheapest way to say so. The brand
+   gets the first track on its own so the lockup has air rather than reading
+   as a third link list. */
+
+.site-footer__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: clamp(32px, 4vw, 72px);
+  padding: clamp(30px, 4.8vh, 60px) 0 clamp(24px, 3.6vh, 44px);
+  border-top: 1px solid var(--f-line);
+}
+
+.site-footer__brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.34em;
+  font-family: var(--font-accent);
+  font-size: clamp(1.05rem, 1.4vw, 1.35rem);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--f-ink);
+}
+
+.site-footer__brand-mark {
+  flex: none;
+  width: 1em;
+  color: var(--f-gold);
+}
+
+.site-footer__brand-note {
+  margin: clamp(16px, 2.2vh, 26px) 0 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--f-ink-soft);
+}
+
+.site-footer__nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(24px, 3vw, 56px);
+}
+
+/* The one label style in the footer: tracked caps at 11.5px, over each link
+   column and over the contacts. It is what makes the band read as a directory
+   instead of three unrelated blocks. */
+.site-footer__column-title {
+  margin: 0 0 clamp(14px, 2vh, 24px);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--f-ink-faint);
+}
+
+.site-footer__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.site-footer__link {
+  font-size: 15px;
+  color: var(--f-ink-soft);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.site-footer__link:hover {
+  color: var(--f-ink);
+}
+
+/* ------------------------------------------------------------
+   Reach us
+   ------------------------------------------------------------ */
+
+.site-footer__reach-line {
+  margin: 0 0 clamp(18px, 2.4vh, 28px);
+  max-width: 20ch;
+  font-size: 19px;
+  font-weight: 650;
+  line-height: 1.22;
+  letter-spacing: var(--track-title);
+  color: var(--f-ink);
+}
+
+.site-footer__contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.site-footer__contact {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+/* Outlined, not filled. The one filled control in this footer is the estimate
+   button, and there is exactly one of those. Square-ish rather than round, to
+   rhyme with the button and the frames rather than with the seal. */
+.site-footer__contact-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid rgba(243, 240, 231, 0.2);
+  color: var(--f-ink);
+}
+
+.site-footer__contact-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.site-footer__contact-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--f-ink-faint);
+}
+
+.site-footer__contact-value {
+  font-size: 14px;
+  color: var(--f-ink);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.site-footer__contact-value:hover {
+  color: var(--f-gold);
+}
+
+/* ------------------------------------------------------------
+   Legal, and the way back up
+   ------------------------------------------------------------
+
+   A hairline strip in the gap between the directory and the wordmark. No rule
+   above it: the directory already carries one, and a second here would cut
+   the frame in two right where the monument needs the room to read as one
+   object rising off the bottom. */
+
+.site-footer__base {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+  flex-wrap: wrap;
+}
+
+.site-footer__base-left {
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 2.4vw, 34px);
+}
+
+/* Held clear of the fixed dock in the corner. The links are still readable
+   under it — they are type, not a target — but a hit area that lands beneath
+   a floating button is a link that cannot be clicked. */
+.site-footer__legal--right {
+  padding-right: clamp(0px, 5vw, 92px);
+}
+
+.site-footer__legal {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--f-ink-faint);
+}
+
+.site-footer__legal-sep {
+  padding: 0 8px;
+  color: rgba(213, 177, 106, 0.55);
+}
+
+/* Demoted to a quiet outlined control at the end of the legal strip. It used
+   to be a cream pill in the middle of the band, which made the loudest thing
+   in the footer the one action that goes nowhere. */
+.site-footer__totop {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 7px 7px 16px;
+  border: 1px solid rgba(240, 236, 226, 0.16);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--f-ink-soft);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.site-footer__totop:hover {
+  color: var(--f-ink);
+  border-color: rgba(240, 236, 226, 0.34);
+}
+
+.site-footer__totop-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(240, 236, 226, 0.1);
+  color: var(--f-ink);
+  transition: transform 0.2s ease;
+}
+
+.site-footer__totop:hover .site-footer__totop-icon {
+  transform: translateY(-2px);
+}
+
+/* ------------------------------------------------------------
+   The monument
+   ------------------------------------------------------------
+
+   Sized off the viewport width so it always spans the frame edge to edge, and
+   pulled below the footer's own bottom so its baseline is cut off. Set in the
+   page's own ink rather than a whisper of it: at this scale a faint wordmark
+   reads as a watermark someone forgot to remove, and the point is the
+   opposite — it is the loudest thing on the page and the last.
+
+   The mark is a flex sibling sized in em, so it tracks the wordmark through
+   every viewport without a second set of breakpoints. */
+
+.site-footer__monument {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1em;
+  margin-top: clamp(14px, 3vh, 36px);
+  /* Both of these do the cropping, and both are in em so the crop is a fixed
+     fraction of the letterform at every width. A pixel value would take the
+     baseline off on a laptop and the whole bottom third off on a monitor. */
+  margin-bottom: -0.15em;
+  /* The accent face. This is the brand name at the largest size it is ever
+     set, so if Unbounded earns its place anywhere it is here. */
+  font-family: var(--font-accent);
+  /* Tuned so the mark and the eight caps together span the frame with a hair
+     of air at each end. Far smaller a number than the same lockup in Albert
+     Sans wanted, because Unbounded is drawn close to half again as wide.
+     Uppercase: at this size the lowercase ascender and descender lines fight
+     the crop, and caps give one clean edge to cut. */
+  font-size: 14.3vw;
+  font-weight: 400;
+  line-height: 0.78;
+  /* No negative tracking. Unbounded is spaced the way it wants to be and
+     closing it up collides the bowls. */
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+  color: var(--f-ink);
+}
+
+.site-footer__monument-mark {
+  flex: none;
+  width: 0.6em;
+  /* Optical, not metric: the caps sit above the middle of the line box, so
+     centring the mark on the box drops it visibly low against them. */
+  margin-bottom: 0.08em;
+}
+
+.site-footer__monument-word {
+  /* Trailing sidebearing on the last cap is dead space at this size and
+     throws the whole lockup left of centre. */
+  margin-right: -0.04em;
+}
+
+/* ------------------------------------------------------------
+   The monument rises, letter by letter
+   ------------------------------------------------------------
+
+   The footer arrives by pushing, and this is the last beat of that arrival:
+   the wordmark does not simply ride up with the panel, it comes up out of it
+   one cap at a time once the panel has landed. The mark leads and the caps
+   follow left to right, which is the order they are read in anyway.
+
+   Held at the start state unconditionally rather than only under the class, so
+   the letters are never briefly painted in place before the observer has had a
+   frame to run. */
+
+.site-footer__monument-mark,
+.site-footer__monument-letter {
+  opacity: 0;
+  /* In em, so the travel is the same fraction of the letterform at every
+     width — the monument is sized in vw, and a pixel distance that reads as a
+     rise on a laptop reads as a twitch on a monitor. */
+  transform: translateY(0.34em);
+}
+
+/* Transformable at all — and the reason the face's kerning is off here. */
+.site-footer__monument-letter {
+  display: inline-block;
+}
+
+.site-footer__monument.is-risen .site-footer__monument-mark,
+.site-footer__monument.is-risen .site-footer__monument-letter {
+  animation: monument-rise 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  /* Short enough that nine steps finish within about half a second of each
+     other, so the word still arrives as a word and not as nine events. */
+  animation-delay: calc(var(--i) * 62ms);
+  will-change: transform, opacity;
+}
+
+@keyframes monument-rise {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Kept separate from the narrow block below: the rise is worth having on a
+   phone, where the footer is only the last section on the page and the
+   wordmark is the one thing that still makes an entrance. It is the motion
+   preference alone that turns it off, and then the monument is simply there,
+   which is what it looked like before any of this. */
+@media (prefers-reduced-motion: reduce) {
+  .site-footer__monument-mark,
+  .site-footer__monument-letter,
+  .site-footer__monument.is-risen .site-footer__monument-mark,
+  .site-footer__monument.is-risen .site-footer__monument-letter {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+  }
+}
+
+/* Between the wide band and the stack: the contacts drop under the brand and
+   the two link columns keep the right-hand track, so the band stays two rows
+   of real content instead of three squeezed ones. */
+@media (max-width: 1120px) {
+  .site-footer__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    row-gap: clamp(30px, 4vh, 48px);
+  }
+
+  .site-footer__nav {
+    grid-row: span 2;
+  }
+}
+
+/* ------------------------------------------------------------
+   Narrow
+   ------------------------------------------------------------ */
+
+@media (max-width: 900px) {
+  .site-footer__inner {
+    padding-top: clamp(48px, 11vw, 84px);
+  }
+
+  .site-footer__call {
+    padding-bottom: clamp(36px, 9vw, 64px);
+  }
+
+  .site-footer__line {
+    font-size: calc(clamp(2.1rem, 10vw, 3.6rem) * var(--display-scale));
+  }
+
+  /* The directory stops being a band. The brand takes a row of its own and
+     the two link columns sit side by side under it, because a phone-width
+     column of four links is a list, and two of them stacked is a scroll. */
+  .site-footer__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+  }
+
+  .site-footer__base {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .site-footer__base-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .site-footer__legal--right {
+    padding-right: 0;
+  }
+
+  .site-footer__monument {
+    font-size: 13.4vw;
+  }
+}

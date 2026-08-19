@@ -1,0 +1,476 @@
+/* ============================================================
+   About — a day, panned
+   ============================================================
+
+   The section is one horizontal move through four slides.
+
+   It used to run a full day alongside that move — the ground travelling dawn
+   to night while the panels stayed lit — with the stops tweened onto the
+   custom properties below. That is gone, and these values are now simply the
+   section's colours rather than the first stop of a sequence. Nothing here
+   animates; everything still paints from these properties, so retinting the
+   section is still a matter of changing them in one place. */
+
+.about {
+  --about-surface: var(--page-ground);
+  --about-panel: var(--page-paper);
+  /* Copy on a panel. Dark at every hour, because the panels are lit at every
+     hour. */
+  --about-ink: var(--sol-ink);
+  /* Secondary copy is the ink at reduced alpha rather than a grey of its own.
+     A grey at any opacity reads as dirt on these grounds, and it also loses
+     the surface's temperature the moment the surface changes. */
+  --about-ink-soft: rgba(11, 11, 12, 0.62);
+  /* Copy on the open ground. This pair is the one that crosses to light. */
+  --about-sky-ink: var(--sol-ink);
+  --about-sky-ink-soft: rgba(11, 11, 12, 0.62);
+  --about-ghost: var(--sol-dusk);
+  --about-hairline: rgba(11, 11, 12, 0.14);
+
+  position: relative;
+  font-family: var(--font-body);
+}
+
+.about__viewport {
+  position: relative;
+  /* Exactly the viewport, not a minimum: this is the pinned element, and a
+     pin only sits still if the thing being pinned is the height of the frame
+     it is being held in. */
+  height: 100dvh;
+  min-height: 620px;
+  overflow: hidden;
+  background: var(--about-surface);
+  isolation: isolate;
+}
+
+/* ------------------------------------------------------------
+   Track
+   ------------------------------------------------------------ */
+
+.about__track {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4vw;
+  height: 100%;
+  /* Trailing space is not decoration. The pan ends when the track's right edge
+     reaches the viewport's, so without room after the last panel that panel
+     finishes its journey pressed against the right gutter and never reaches
+     the middle of the frame — which is where the dolly, the title reveal and
+     the whole point of the last claim are keyed. The tail is roughly half a
+     viewport so the final panel lands centred, on empty night. */
+  padding: 0 32vw 0 9vw;
+  width: max-content;
+  will-change: transform;
+}
+
+.about__statement {
+  flex: 0 0 min(46vw, 620px);
+}
+
+.about__heading {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: calc(clamp(3rem, 5.4vw, 5.6rem) * var(--display-scale));
+  line-height: 0.96;
+  letter-spacing: calc(var(--track-display) + var(--display-tracking-delta));
+  font-weight: calc(500 + var(--display-weight-delta));
+  color: var(--about-sky-ink);
+}
+
+/* The clipping half of the line reveal. Padding rather than a taller
+   line-height so the descender in the second line has somewhere to go without
+   opening a gap between the two. */
+.about__heading-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+
+.about__heading-line > span {
+  display: block;
+}
+
+.about__lede {
+  margin: 30px 0 0;
+  max-width: 44ch;
+  font-size: var(--text-body);
+  line-height: 1.6;
+  color: var(--about-sky-ink-soft);
+}
+
+/* ------------------------------------------------------------
+   Panel
+   ------------------------------------------------------------ */
+
+.about-panel {
+  position: relative;
+  flex: 0 0 min(38vw, 480px);
+  height: min(74vh, 620px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 38px;
+  border-radius: 24px;
+  border: 1px solid var(--about-hairline);
+  background: var(--about-panel);
+  /* Barely there in daylight against a cream ground, and the thing that makes
+     the panels read as lit once the ground goes to night. One shadow doing two
+     jobs, which is why it is warm rather than neutral: a black shadow under a
+     cream card on a black ground is invisible, a warm one spills. */
+  box-shadow: 0 40px 90px -50px rgba(58, 40, 14, 0.55);
+  /* Clips the capsule where it leaves the panel. The photograph is meant to
+     read as continuing past the edge, so it is cropped by the panel rather
+     than fitted inside it. */
+  overflow: hidden;
+  isolation: isolate;
+  /* Scaled from the floor. The dolly grows each panel as it reaches the middle
+     of the frame, and growing from the centre would lift every panel off the
+     baseline they share. */
+  transform-origin: center bottom;
+  will-change: transform;
+}
+
+/* ------------------------------------------------------------
+   The lean
+   ------------------------------------------------------------
+
+   Three panels set slightly off true, so the row reads as things laid down by
+   hand rather than as a carousel on rails.
+
+   `rotate` and `translate`, NOT `transform`. That is the whole reason this
+   works: AboutSection's timeline writes transform on these same elements —
+   the dolly's scale and yPercent — and a second author on that property is
+   the one thing AboutPanel's header warns about. The individual transform
+   properties are separate declarations that the browser composes with
+   transform rather than replacing it, so GSAP keeps sole ownership of what it
+   owns and the lean survives every tween untouched.
+
+   Composition order is translate, then rotate, then transform. The dolly's
+   yPercent therefore travels along the tilted axis, which at these angles is
+   a sub-pixel difference and not worth correcting for.
+
+   Angles are deliberately unequal and unpatterned. Alternating the same value
+   left and right is a zig-zag, and a zig-zag is just a different alignment.
+   The vertical offsets break the shared baseline for the same reason. Both
+   stay small enough that the row still reads as a row: past about 3 degrees
+   the panels stop looking placed and start looking broken. */
+
+.about-panel:nth-of-type(1) {
+  rotate: -1.9deg;
+  translate: 0 -12px;
+}
+
+.about-panel:nth-of-type(2) {
+  rotate: 1.3deg;
+  translate: 0 16px;
+}
+
+/* Leans the same way as its neighbour rather than back the other way, and
+   harder. Below roughly 1.5 degrees a panel this size reads as straight-with-
+   a-rendering-error rather than as tilted, which is where this one started —
+   and it is the panel that ends the pan alone in the middle of the frame with
+   nothing beside it to be crooked against, so it needs the most angle, not
+   the least. */
+.about-panel:nth-of-type(3) {
+  rotate: 2.4deg;
+  translate: 0 -18px;
+}
+
+/* A single hairline arc, swung in from the bottom-left corner. It is the one
+   piece of drawn decoration in the section and it earns its place by giving
+   the flat panels a direction; a second one would just be texture. */
+.about-panel::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: -22%;
+  bottom: -44%;
+  width: 104%;
+  aspect-ratio: 1;
+  border: 1px solid var(--about-hairline);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.about-panel__media {
+  position: absolute;
+  z-index: 1;
+  top: 30px;
+  right: 0;
+  width: 78%;
+  height: 44%;
+  overflow: hidden;
+  /* Rounded on the side that stays inside the panel, square on the side that
+     runs off it. The flat right edge is what sells the crop. */
+  border-radius: 999px 0 0 999px;
+  background: #ece5d8;
+}
+
+/* Overscanned in both axes and inset by the overscan, so neither the settle
+   zoom nor the counter-drift can pull the photograph off its own frame. Sized
+   by inset rather than by a negative margin: a percentage margin resolves
+   against the container's *width*, which on a capsule this shape pushed the
+   image most of the way out of view. */
+.about-panel__image {
+  position: absolute;
+  top: -8%;
+  left: -8%;
+  width: 116%;
+  height: 116%;
+  object-fit: cover;
+  will-change: transform;
+}
+
+/* Arbitrary photography has to sit inside a palette that is itself moving from
+   cream to near-black. A soft gold-into-shadow wash does that without a
+   destructive filter on the source, so a real photograph dropped in later is
+   graded rather than recoloured. */
+.about-panel__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    198deg,
+    rgba(176, 138, 83, 0.1) 0%,
+    rgba(30, 22, 10, 0) 44%,
+    rgba(30, 22, 10, 0.26) 100%
+  );
+}
+
+.about-panel__body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.about-panel__copy {
+  min-width: 0;
+}
+
+.about-panel__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: calc(clamp(1.6rem, 2.1vw, 2.35rem) * var(--display-scale));
+  line-height: 1.04;
+  letter-spacing: calc(var(--track-headline) + var(--display-tracking-delta));
+  font-weight: calc(500 + var(--display-weight-delta));
+  color: var(--about-ink);
+}
+
+.about-panel__title-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+}
+
+.about-panel__title-line > span {
+  display: block;
+}
+
+.about-panel__text {
+  margin: 16px 0 0;
+  max-width: 38ch;
+  font-size: var(--text-body);
+  line-height: 1.55;
+  color: var(--about-ink-soft);
+}
+
+/* In flow at the end of the copy row rather than pinned to the panel's corner.
+   Absolute, it collided with the capsule at some widths and with the last line
+   of copy at others. */
+.about-panel__number {
+  flex: none;
+  font-family: var(--font-display);
+  font-size: calc(clamp(2.8rem, 3.6vw, 4.2rem) * var(--display-scale));
+  font-weight: calc(500 + var(--display-weight-delta));
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  color: var(--about-ghost);
+  will-change: transform;
+}
+
+/* ------------------------------------------------------------
+   Focus
+   ------------------------------------------------------------ */
+
+.about :focus-visible {
+  outline: 2px solid rgba(176, 138, 83, 0.85);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ------------------------------------------------------------
+   Narrow
+   ------------------------------------------------------------
+
+   The pan is gone below this width, and with it the reason the track was a
+   row. Everything unstacks: the viewport stops being a frame and becomes an
+   ordinary section, the slides become a column, and the sun goes away rather
+   than crossing a screen it no longer has room to cross. */
+
+@media (max-width: 900px) {
+  .about__viewport {
+    height: auto;
+    min-height: 0;
+    padding: 88px 0 96px;
+  }
+
+  .about__track {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 22px;
+    width: auto;
+    height: auto;
+    padding: 0 40px;
+  }
+
+  .about__statement {
+    flex: none;
+    margin-bottom: 18px;
+  }
+
+  .about__heading {
+    font-size: calc(clamp(2.7rem, 6.4vw, 4rem) * var(--display-scale));
+  }
+
+  .about__lede {
+    max-width: 56ch;
+  }
+
+  .about-panel {
+    flex: none;
+    height: auto;
+    min-height: 480px;
+  }
+
+  /* Halved, and the vertical offsets dropped. Stacked, the panels run nearly
+     the full width of a narrow screen with only the track's gutter either
+     side, and the angle that reads as a lean on a wide row swings the top
+     corners straight into that gutter. The offsets go because a column
+     already has its own rhythm — nudging cards up and down inside it just
+     makes the gaps look uneven. */
+  .about-panel:nth-of-type(1) {
+    rotate: -0.9deg;
+    translate: none;
+  }
+
+  .about-panel:nth-of-type(2) {
+    rotate: 0.7deg;
+    translate: none;
+  }
+
+  .about-panel:nth-of-type(3) {
+    rotate: 1.1deg;
+    translate: none;
+  }
+
+  /* The same release the reduced-motion block performs, for the same reason
+     and on the far more common path. Stacked, the panels get one `gsap.from`
+     entrance each and are then static for the rest of the page's life — but
+     the base rules promise the compositor that four elements are still about
+     to move, and it holds a layer for each of them until the section
+     unmounts. */
+  .about__track,
+  .about-panel,
+  .about-panel__image,
+  .about-panel__number {
+    will-change: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .about__viewport {
+    padding: 72px 0 80px;
+  }
+
+  .about__track {
+    padding: 0 20px;
+    gap: 18px;
+  }
+
+  .about__heading {
+    font-size: calc(clamp(2.3rem, 10vw, 3.1rem) * var(--display-scale));
+    letter-spacing: calc(var(--track-headline) + var(--display-tracking-delta));
+  }
+
+  .about-panel {
+    min-height: 0;
+    padding: 22px;
+    justify-content: flex-start;
+  }
+
+  /* The capsule crop needs width to read as a crop. At this size it is a
+     sliver of photograph with one round end, so the image becomes an ordinary
+     banner at the top of the panel and the panel grows to fit its copy. */
+  .about-panel__media {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 190px;
+    margin-bottom: 24px;
+    border-radius: 16px;
+  }
+
+  .about-panel__body {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .about-panel__number {
+    font-size: calc(2.4rem * var(--display-scale));
+  }
+}
+
+/* ------------------------------------------------------------
+   Reduced motion
+   ------------------------------------------------------------
+
+   The section still says what it says; it just says it at one time of day.
+   AboutSection stops driving the light here, so these are the values that are
+   left, and `will-change` comes off elements that are no longer promising to
+   move. */
+
+@media (prefers-reduced-motion: reduce) {
+  .about__viewport {
+    height: auto;
+    min-height: 0;
+    padding: 88px 0 96px;
+  }
+
+  /* Capped and centred, unlike the narrow-screen column. This branch also
+     catches a 1440px desktop, where a full-bleed stack turns each panel into a
+     1400px-wide card with its copy stranded in one corner. */
+  .about__track {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 22px;
+    width: auto;
+    max-width: 980px;
+    height: auto;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .about__statement,
+  .about-panel {
+    flex: none;
+  }
+
+  .about-panel {
+    height: auto;
+    min-height: 460px;
+  }
+
+  .about__track,
+  .about-panel,
+  .about-panel__image,
+  .about-panel__number {
+    will-change: auto;
+  }
+}

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- The hero background, and almost certainly the page's LCP element. It is
+         applied as a background-image from JS, which puts it behind the whole
+         module graph: the preload scanner cannot see a URL that does not exist
+         until React has rendered, so without this line the largest image on the
+         page does not begin downloading until the bundle has been fetched,
+         parsed and run. Only the morning frame — night is the toggle, and
+         BackgroundTransition warms it on an idle callback instead.
+
+         Two files rather than one because the hero is built in planes now: the
+         house on its own layer over the scene it was cut out of. The flat
+         original is still shipped, but Our Cases and the footer are what fetch
+         it, and neither is anywhere near the fold. -->
+    <link rel="preload" as="image" href="/images/solar-house-day-back-blur.jpeg" />
+    <link rel="preload" as="image" href="/images/solar-house-day-no-bg.png" />
+    <!-- The two shipping faces only. Every other candidate is fetched by the
+         typography lab the first time it is selected.
+
+         Albert Sans carries the page; Unbounded is the accent and is only ever
+         set on the brand name, so it is pulled at the two weights the wordmark
+         actually uses rather than across its full variable range. -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300..700&family=Unbounded:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <title>Solstice — $0 Electricity Bills</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

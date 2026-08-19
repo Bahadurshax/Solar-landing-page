@@ -1,0 +1,181 @@
+/* ============================================================
+   Partners
+   ============================================================
+
+   Midday, on the page's default ground. It sits between two sections that are
+   both louder than it is by design: this one is a list of names, and the job
+   of the composition is to keep it from pretending to be an argument.
+
+   The whole section is one band and two lines of type. There are no cards,
+   because six names in six boxes is six containers doing the work one row of
+   type already does, and the system's own instruction is to reach for spacing
+   before reaching for elevation. */
+
+.partners {
+  --p-ink: var(--sol-ink);
+  --p-soft: rgba(11, 11, 12, 0.62);
+  --p-line: rgba(11, 11, 12, 0.13);
+
+  position: relative;
+  padding: clamp(88px, 11vw, 168px) clamp(20px, 5vw, 56px);
+  background: var(--sol-ground);
+  color: var(--p-ink);
+}
+
+/* Centred, which is the one place on the page that happens outside the
+   footer's closing line. It is allowed here because the band below it is
+   symmetrical and full width: a left-aligned heading over a bleeding band
+   leaves the heading hanging off the one edge the band does not have. */
+.partners__head {
+  max-width: 1500px;
+  margin: 0 auto clamp(46px, 8vh, 96px);
+  text-align: center;
+}
+
+.partners__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: calc(clamp(1.9rem, 3.4vw, 3rem) * var(--display-scale));
+  font-weight: calc(500 + var(--display-weight-delta));
+  line-height: 1.12;
+  letter-spacing: calc(var(--track-headline) + var(--display-tracking-delta));
+  text-wrap: balance;
+}
+
+.partners__lede {
+  margin: 20px auto 0;
+  max-width: 56ch;
+  font-size: var(--text-body);
+  line-height: 1.62;
+  color: var(--p-soft);
+}
+
+/* ------------------------------------------------------------
+   The band
+   ------------------------------------------------------------ */
+
+/* Two hairlines and nothing else. They stop at the content column while the
+   names run past it, which is what tells the eye the band continues rather
+   than ends: a rule that ran the full width would close the shape it is
+   supposed to leave open. */
+.partners__band {
+  position: relative;
+  padding: clamp(26px, 4vh, 44px) 0;
+  border-top: 1px solid var(--p-line);
+  border-bottom: 1px solid var(--p-line);
+}
+
+/* Out through the section's own gutter, and faded at both ends. The fade is
+   the honest edge for a band that is longer than the frame: a hard cut says
+   the list stops there, and it does not. */
+.partners__bleed {
+  margin: 0 calc(clamp(20px, 5vw, 56px) * -1);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 9%,
+    #000 91%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 9%,
+    #000 91%,
+    transparent
+  );
+}
+
+/* width: max-content so the two copies sit on one line and the track is
+   exactly twice a lap. The transform is GSAP's; nothing here animates. */
+.partners__track {
+  display: flex;
+  width: max-content;
+}
+
+.partners__set {
+  display: flex;
+  align-items: center;
+  gap: clamp(46px, 7vw, 110px);
+  padding-right: clamp(46px, 7vw, 110px);
+}
+
+.partners__item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  white-space: nowrap;
+}
+
+/* Initials in a ring, at the Control step. A drawn mark rather than a fetched
+   logo, for the reason given at the top of data/partners.js. */
+.partners__mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 1px solid var(--p-line);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.partners__name {
+  font-size: clamp(1.35rem, 1.65vw, 1.85rem);
+  font-weight: 400;
+  letter-spacing: var(--track-title);
+}
+
+/* ------------------------------------------------------------
+   Where the band stops being a band
+   ------------------------------------------------------------
+
+   Mirrors MARQUEE_OK in breakpoints.js, and all three of its conditions: the
+   wall's own 901px, a fine pointer, and the motion preference. Change one
+   here and change it there.
+
+   The band brakes under the cursor, and that is the only thing keeping a
+   marquee honest. Without a cursor there is no brake, so there is no marquee:
+   the same six names wrap into a centred block that holds still and can be
+   read at whatever speed the reader wants. */
+@media (max-width: 900px), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .partners__bleed {
+    margin: 0;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .partners__track {
+    width: 100%;
+    /* The duplicate copy is display:none rather than removed from the markup,
+       because the branch is a media query and the markup cannot know which
+       side of it the visitor is on. */
+    transform: none !important;
+  }
+
+  .partners__track .partners__set + .partners__set {
+    display: none;
+  }
+
+  .partners__set {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 26px clamp(28px, 6vw, 56px);
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .partners__set {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+  }
+
+  .partners__band {
+    padding: 34px 0;
+  }
+}

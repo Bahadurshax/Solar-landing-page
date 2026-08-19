@@ -1,0 +1,416 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-16T00:00:00Z",
+  "title": "Design System: Solstice Energy",
+  "extensions": {
+    "colorMeta": {
+      "low-sun": {
+        "role": "primary",
+        "displayName": "Low Sun",
+        "canonical": "#b08a53",
+        "tonalRamp": [
+          "oklch(0.18 0.030 72)",
+          "oklch(0.28 0.045 72)",
+          "oklch(0.38 0.058 72)",
+          "oklch(0.48 0.068 72)",
+          "oklch(0.63 0.076 72)",
+          "oklch(0.74 0.070 72)",
+          "oklch(0.85 0.050 72)",
+          "oklch(0.95 0.024 72)"
+        ]
+      },
+      "low-sun-lifted": {
+        "role": "primary",
+        "displayName": "Low Sun (on night)",
+        "canonical": "#d5b16a",
+        "tonalRamp": [
+          "oklch(0.20 0.032 78)",
+          "oklch(0.30 0.048 78)",
+          "oklch(0.41 0.062 78)",
+          "oklch(0.52 0.074 78)",
+          "oklch(0.66 0.082 78)",
+          "oklch(0.78 0.074 78)",
+          "oklch(0.88 0.052 78)",
+          "oklch(0.96 0.026 78)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#fffdf8",
+        "tonalRamp": [
+          "oklch(0.16 0.006 85)",
+          "oklch(0.27 0.008 85)",
+          "oklch(0.40 0.010 85)",
+          "oklch(0.54 0.011 85)",
+          "oklch(0.68 0.011 85)",
+          "oklch(0.81 0.010 85)",
+          "oklch(0.91 0.008 85)",
+          "oklch(0.99 0.006 85)"
+        ]
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Ground",
+        "canonical": "#f8f6f1",
+        "tonalRamp": [
+          "oklch(0.16 0.005 90)",
+          "oklch(0.27 0.007 90)",
+          "oklch(0.40 0.008 90)",
+          "oklch(0.54 0.009 90)",
+          "oklch(0.68 0.009 90)",
+          "oklch(0.81 0.008 90)",
+          "oklch(0.91 0.007 90)",
+          "oklch(0.98 0.005 90)"
+        ]
+      },
+      "ground-warm": {
+        "role": "neutral",
+        "displayName": "Warm Ground",
+        "canonical": "#f4efe4",
+        "tonalRamp": [
+          "oklch(0.16 0.010 85)",
+          "oklch(0.27 0.014 85)",
+          "oklch(0.40 0.017 85)",
+          "oklch(0.54 0.019 85)",
+          "oklch(0.68 0.019 85)",
+          "oklch(0.81 0.017 85)",
+          "oklch(0.91 0.013 85)",
+          "oklch(0.97 0.010 85)"
+        ]
+      },
+      "dusk-surface": {
+        "role": "tertiary",
+        "displayName": "Dusk Surface",
+        "canonical": "#e0cba4",
+        "tonalRamp": [
+          "oklch(0.18 0.020 80)",
+          "oklch(0.29 0.030 80)",
+          "oklch(0.41 0.038 80)",
+          "oklch(0.53 0.044 80)",
+          "oklch(0.67 0.048 80)",
+          "oklch(0.79 0.046 80)",
+          "oklch(0.88 0.034 80)",
+          "oklch(0.96 0.018 80)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#121212",
+        "tonalRamp": [
+          "oklch(0.12 0.002 0)",
+          "oklch(0.24 0.002 0)",
+          "oklch(0.36 0.002 0)",
+          "oklch(0.48 0.002 0)",
+          "oklch(0.61 0.002 0)",
+          "oklch(0.74 0.002 0)",
+          "oklch(0.86 0.002 0)",
+          "oklch(0.96 0.002 0)"
+        ]
+      },
+      "night-blue": {
+        "role": "secondary",
+        "displayName": "Night Blue",
+        "canonical": "#08111c",
+        "tonalRamp": [
+          "oklch(0.13 0.020 250)",
+          "oklch(0.23 0.030 250)",
+          "oklch(0.34 0.038 250)",
+          "oklch(0.46 0.044 250)",
+          "oklch(0.60 0.046 250)",
+          "oklch(0.73 0.038 250)",
+          "oklch(0.85 0.026 250)",
+          "oklch(0.95 0.012 250)"
+        ]
+      },
+      "night-warm": {
+        "role": "secondary",
+        "displayName": "Warm Night",
+        "canonical": "#100e09",
+        "tonalRamp": [
+          "oklch(0.12 0.008 80)",
+          "oklch(0.23 0.012 80)",
+          "oklch(0.35 0.016 80)",
+          "oklch(0.47 0.018 80)",
+          "oklch(0.61 0.018 80)",
+          "oklch(0.74 0.016 80)",
+          "oklch(0.86 0.012 80)",
+          "oklch(0.96 0.007 80)"
+        ]
+      },
+      "warn": {
+        "role": "semantic",
+        "displayName": "Warn",
+        "canonical": "#8f3a1e",
+        "tonalRamp": [
+          "oklch(0.18 0.052 42)",
+          "oklch(0.28 0.082 42)",
+          "oklch(0.40 0.112 42)",
+          "oklch(0.52 0.128 42)",
+          "oklch(0.64 0.116 42)",
+          "oklch(0.76 0.086 42)",
+          "oklch(0.87 0.052 42)",
+          "oklch(0.96 0.022 42)"
+        ]
+      },
+      "lit": {
+        "role": "neutral",
+        "displayName": "Lit",
+        "canonical": "#f7eeda",
+        "tonalRamp": [
+          "oklch(0.17 0.012 84)",
+          "oklch(0.28 0.017 84)",
+          "oklch(0.41 0.022 84)",
+          "oklch(0.54 0.025 84)",
+          "oklch(0.68 0.026 84)",
+          "oklch(0.81 0.023 84)",
+          "oklch(0.91 0.018 84)",
+          "oklch(0.98 0.012 84)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The page's three or four genuine statements only: the hero headline, the footer's closing line, and the conversion band's phone number."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section headings. Balanced wrapping via text-wrap: balance."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card and panel titles inside a section."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All running copy. Measure held to 65-75ch."
+      },
+      "field": {
+        "displayName": "Field",
+        "purpose": "Text the visitor types into. 16px is a floor, not a preference: below it iOS zooms the viewport on focus and the visitor loses the form."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Button and submit labels."
+      },
+      "ui": {
+        "displayName": "UI",
+        "purpose": "Form labels, small meta lines, secondary interface text that is read rather than scanned."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Helper text and validation messages. The smallest text that must still read comfortably."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Step numbers, stat labels, contact categories. The tracked uppercase register, not a general small size."
+      },
+      "brand": {
+        "displayName": "Brand",
+        "purpose": "The word Solstice and nothing else, at any size from navbar to footer monument."
+      }
+    },
+    "shadows": [
+      {
+        "name": "contact-small",
+        "value": "0 8px 18px -12px rgba(120, 88, 40, 0.45)",
+        "purpose": "Chips and small controls resting lightly on a warm ground."
+      },
+      {
+        "name": "contact-card",
+        "value": "0 20px 38px -26px rgba(120, 88, 40, 0.55)",
+        "purpose": "Case cards and About panels at rest."
+      },
+      {
+        "name": "contact-deep",
+        "value": "0 40px 90px -50px rgba(58, 40, 14, 0.55)",
+        "purpose": "The largest raised surfaces, where the drop must read across a full section."
+      },
+      {
+        "name": "contact-night",
+        "value": "0 14px 34px -16px rgba(0, 0, 0, 0.9)",
+        "purpose": "The same contact shadow on a night ground, where darkness carries the tint."
+      },
+      {
+        "name": "inset-hairline",
+        "value": "inset 0 0 0 1px rgba(255, 255, 255, 0.07)",
+        "purpose": "A lit edge on dark panels, used instead of a border so the corner radius stays clean."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-arrival",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The system default for anything arriving or settling. Exponential out: decisive, never overshooting."
+      },
+      {
+        "name": "ease-mode",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "The morning/night token crossfade, 0.6s. Flat at both ends so the change has no corner."
+      },
+      {
+        "name": "ease-step",
+        "value": "expo.out",
+        "purpose": "GSAP step transitions in the pinned card stage, 0.6s. Arrives decisively without crossing the target."
+      },
+      {
+        "name": "duration-color",
+        "value": "0.45s",
+        "purpose": "Colour-only transitions when the hour changes."
+      },
+      {
+        "name": "marquee-a",
+        "value": "50s linear infinite",
+        "purpose": "Testimonial column A. Must stay linear: any easing on a loop that wraps at -50% pulses once per cycle."
+      },
+      {
+        "name": "marquee-b",
+        "value": "58s linear infinite",
+        "purpose": "Testimonial column B. Deliberately unequal to A, or the pair reads as one hinged object."
+      }
+    ],
+    "breakpoints": [
+      { "name": "pinned-stage", "value": "769px" },
+      { "name": "wide-stage", "value": "901px" },
+      { "name": "desktop-nav", "value": "1025px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button (daylight)",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The navbar CTA under morning light. Inverts to a lit fill at night.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">Get an Instant Quote</a>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; height: 52px; padding: 0 28px; border-radius: 11px; background: #0d0d0d; color: #f7f5ee; font-family: 'Albert Sans', system-ui, sans-serif; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; text-decoration: none; transition: transform 0.18s ease, filter 0.18s ease; } .ds-btn-primary:hover { transform: scale(1.04); filter: brightness(1.08); } .ds-btn-primary:focus-visible { outline: 2px solid #0d0d0d; outline-offset: 3px; }"
+    },
+    {
+      "name": "Call Action",
+      "kind": "button",
+      "refersTo": "button-call",
+      "description": "The conversion band's primary action on a night ground.",
+      "html": "<a class=\"ds-btn-call\" href=\"tel:+998612248372\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z\"/></svg>Call now</a>",
+      "css": ".ds-btn-call { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 52px; padding: 0 26px; border-radius: 999px; background: #f7eeda; color: #14100a; font-family: 'Albert Sans', system-ui, sans-serif; font-size: 0.98rem; font-weight: 600; text-decoration: none; box-shadow: 0 14px 34px -16px rgba(0,0,0,0.9); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), background-color 0.3s ease; } .ds-btn-call:hover { transform: translateY(-2px); background: #fffaf0; } .ds-btn-call:focus-visible { outline: 2px solid #d5b16a; outline-offset: 4px; }"
+    },
+    {
+      "name": "Ghost Action",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Subordinate actions on a night ground. Hairline only; never a second fill.",
+      "html": "<a class=\"ds-btn-ghost\" href=\"#\">Telegram</a>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 46px; padding: 0 18px; border: 1px solid rgba(247,238,218,0.16); border-radius: 999px; background: transparent; color: rgba(247,238,218,0.62); font-family: 'Albert Sans', system-ui, sans-serif; font-size: 0.98rem; font-weight: 500; text-decoration: none; transition: border-color 0.3s ease, color 0.3s ease; } .ds-btn-ghost:hover { border-color: rgba(247,238,218,0.36); color: #f7eeda; } .ds-btn-ghost:focus-visible { outline: 2px solid #d5b16a; outline-offset: 4px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "card-case",
+      "description": "A form field on lit paper. Required marks and errors carry the Warn state colour; focus takes a Low Sun ring.",
+      "html": "<label class=\"ds-field-label\" for=\"ds-demo\">Full Address<span class=\"ds-field-req\">*</span></label><input class=\"ds-field\" id=\"ds-demo\" type=\"text\" placeholder=\"Street, district, and city\">",
+      "css": ".ds-field-label { display: block; margin-bottom: 7px; font-family: 'Albert Sans', system-ui, sans-serif; font-size: 14px; font-weight: 500; letter-spacing: -0.005em; color: #121212; } .ds-field-req { margin-left: 3px; color: #8f3a1e; } .ds-field { width: 100%; padding: 13px 15px; border: 1px solid rgba(18,18,18,0.14); border-radius: 12px; background: #faf7f0; color: #121212; font-family: 'Albert Sans', system-ui, sans-serif; font-size: 16px; line-height: 1.4; transition: border-color 0.2s ease, background-color 0.2s ease; } .ds-field::placeholder { color: rgba(18,18,18,0.58); } .ds-field:hover { border-color: rgba(18,18,18,0.24); } .ds-field:focus { outline: none; background: #fffdf8; border-color: #b08a53; } .ds-field:focus-visible { outline: 2px solid #b08a53; outline-offset: 2px; }"
+    },
+    {
+      "name": "Region Chip",
+      "kind": "chip",
+      "refersTo": "chip-region",
+      "description": "Map region filter. Selection is carried by hairline strength and a contact shadow, never by colour alone.",
+      "html": "<button class=\"ds-chip\" type=\"button\">Amudarya Delta</button><button class=\"ds-chip ds-chip--on\" type=\"button\" aria-pressed=\"true\">Aral North</button>",
+      "css": ".ds-chip { min-height: 40px; padding: 0 18px; margin-right: 8px; border: 1px solid rgba(176,138,83,0.24); border-radius: 999px; background: transparent; color: #121212; font-family: 'Albert Sans', system-ui, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: border-color 0.25s ease, box-shadow 0.25s ease; } .ds-chip:hover { border-color: rgba(176,138,83,0.45); } .ds-chip--on { border-color: rgba(176,138,83,0.45); box-shadow: 0 8px 18px -12px rgba(120,88,40,0.45); } .ds-chip:focus-visible { outline: 2px solid #b08a53; outline-offset: 3px; }"
+    },
+    {
+      "name": "Case Card",
+      "kind": "card",
+      "refersTo": "card-case",
+      "description": "A raised paper surface on warm ground. Depth is contact, not lift.",
+      "html": "<article class=\"ds-card\"><h3 class=\"ds-card__title\">The Seytniyazov Family</h3><p class=\"ds-card__body\">10.2 kW in Nukus District. Bill has not moved off zero since the install.</p></article>",
+      "css": ".ds-card { max-width: 360px; padding: 30px; border: 1px solid rgba(0,0,0,0.05); border-radius: 16px; background: #fffdf8; box-shadow: 0 20px 38px -26px rgba(120,88,40,0.55); transition: box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1); } .ds-card:hover { transform: translateY(-2px); box-shadow: 0 26px 56px -30px rgba(96,74,38,0.55); } .ds-card__title { margin: 0 0 10px; font-family: 'Albert Sans', system-ui, sans-serif; font-size: 1.4rem; font-weight: 400; letter-spacing: -0.035em; color: #121212; } .ds-card__body { margin: 0; font-family: 'Albert Sans', system-ui, sans-serif; font-size: 1rem; line-height: 1.62; color: rgba(18,18,18,0.72); }"
+    },
+    {
+      "name": "Testimonial Card",
+      "kind": "custom",
+      "refersTo": "card-case",
+      "description": "One quote. No portrait, no rating, no quotation glyph: at this size the sentence is the design.",
+      "html": "<figure class=\"ds-quote\"><blockquote class=\"ds-quote__text\">My father asked what the catch was. Four years on he is still looking for it.</blockquote><figcaption class=\"ds-quote__who\"><span class=\"ds-quote__name\">Aigul B.</span><span class=\"ds-quote__meta\">Kungrad &middot; 8.4 kW since 2021</span></figcaption></figure>",
+      "css": ".ds-quote { max-width: 380px; margin: 0; padding: 28px; border: 1px solid rgba(92,92,94,0.16); border-radius: 16px; background: #fffdf8; box-shadow: 0 8px 18px -12px rgba(120,88,40,0.45); } .ds-quote__text { margin: 0 0 18px; font-family: 'Albert Sans', system-ui, sans-serif; font-size: 1.05rem; line-height: 1.55; color: #3f3f41; } .ds-quote__who { display: flex; flex-direction: column; gap: 3px; } .ds-quote__name { font-family: 'Albert Sans', system-ui, sans-serif; font-size: 13px; font-weight: 600; color: #5c5c5e; } .ds-quote__meta { font-family: 'Albert Sans', system-ui, sans-serif; font-size: 12px; color: #7a7a7c; }"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "button-primary",
+      "description": "Inline links plus one CTA. Below 1025px the links collapse into a burger; the CTA never collapses.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav__link\" href=\"#\">How It Works</a><a class=\"ds-nav__link ds-nav__link--on\" href=\"#\">Our Cases</a><a class=\"ds-nav__link\" href=\"#\">About Us</a></nav>",
+      "css": ".ds-nav { display: flex; gap: 28px; align-items: center; } .ds-nav__link { font-family: 'Albert Sans', system-ui, sans-serif; font-size: 14px; font-weight: 500; color: rgba(17,17,17,0.64); text-decoration: none; transition: color 0.25s ease; } .ds-nav__link:hover, .ds-nav__link--on { color: #111111; } .ds-nav__link:focus-visible { outline: 2px solid #b08a53; outline-offset: 4px; border-radius: 4px; }"
+    },
+    {
+      "name": "Map Pin",
+      "kind": "custom",
+      "refersTo": "chip-region",
+      "description": "A real button so it carries a focus ring. Positioned from true lat/lon through the map's georeference, never by eye.",
+      "html": "<button class=\"ds-pin\" type=\"button\" aria-label=\"Nukus District\"></button><button class=\"ds-pin ds-pin--on\" type=\"button\" aria-label=\"Kungrad District\" aria-pressed=\"true\"></button>",
+      "css": ".ds-pin { width: 46px; height: 46px; margin-right: 10px; padding: 0; border: none; border-radius: 50%; background: transparent; cursor: pointer; position: relative; } .ds-pin::after { content: ''; position: absolute; inset: 16px; border-radius: 50%; border: 2px solid rgba(176,138,83,0.45); background: #fffdf8; transition: inset 0.3s cubic-bezier(0.16,1,0.3,1), background-color 0.3s ease; } .ds-pin--on::after { inset: 12px; background: #b08a53; border-color: #b08a53; } .ds-pin:focus-visible { outline: 2px solid #b08a53; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Long Daylight",
+    "overview": "The system is a day passing. That is not a metaphor applied afterward — it is the literal structure of the code. Nearly every colour token in this project exists twice, once for morning and once for night, and the page opens on a house you can flip between the two. The About section then runs the full arc as a scrubbed timeline through four light stops, and the argument it makes by doing so is the product's actual argument: the ground goes dark and the windows stay lit.\n\nEverything else follows from that. Surfaces here are not colours, they are light states, and the correct question when adding one is never \"which cream\" but \"what hour is this\". A section that resets to a neutral background because it is a new section has broken the system more than one that picks the wrong hex. Between the dusk of About and the morning of the testimonial wall sits a near-black band holding a phone number in lit ink; it works because it is 9pm, not because dark sections look premium.\n\nThe tone is plain and unornamented, and it is enforced by subtraction. Testimonials carry no ratings, no portraits, no quotation glyphs. The map is georeferenced rather than decorative. There is one accent colour and it is rationed. The restraint is not minimalism as a style — it is the belief that a specific fact outperforms a superlative, which is stated outright in the project's own source comments and should survive every future addition.",
+    "keyCharacteristics": [
+      "Every surface is an hour of the day, not a palette slot.",
+      "One accent, used rarely and always load-bearing.",
+      "Warm throughout: no neutral grey, no neutral black, no neutral shadow.",
+      "Two weights of one typeface carry the whole page; the brand face appears on the brand only.",
+      "Motion argues or it is cut — the test is whether it survives the narrow breakpoint."
+    ],
+    "rules": [
+      {
+        "name": "The Hour Rule",
+        "body": "A new surface picks its background by naming the hour it happens at, then taking the matching token. Sections do not get their own colours; they get positions in the day. If you cannot say what time it is, the section is not designed yet.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Sun Rule",
+        "body": "Low Sun appears on well under a tenth of any screen and never as a fill for a large area. It marks the single active thing, the single route, the single hairline that matters. A second accent hue does not exist in this system; if something needs to stand out and gold is taken, the answer is weight, size, or a lit surface — not a new colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Neutral Rule",
+        "body": "Nothing in this system is neutral grey or pure black. Secondary text is the foreground ink at reduced alpha so it keeps the surface's temperature; a grey at any opacity reads as dirt on these creams. Shadows follow the same rule.",
+        "section": "colors"
+      },
+      {
+        "name": "The Brand Face Rule",
+        "body": "Unbounded sets the word \"Solstice\" and never another word. A heading, a button, a stat or a pull-quote in the brand face is a system violation regardless of how well it reads.",
+        "section": "typography"
+      },
+      {
+        "name": "The Answer Rule",
+        "body": "The phone number in the conversion band is set at the hero headline's scale on purpose: the hero asks and it answers. When a page element is the direct reply to another, match its scale rather than stepping down a level out of habit.",
+        "section": "typography"
+      },
+      {
+        "name": "The Contact Rule",
+        "body": "Every shadow's blur exceeds its offset and its spread is negative. A shadow with zero or positive spread, or with a neutral colour, does not belong to this system — it will read as a generic card drop against these warm grounds.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do pick a new surface's background by naming the hour it happens at, then taking that token (The Hour Rule).",
+      "Do tint every secondary text colour from the foreground ink at reduced alpha, so it keeps the surface's temperature.",
+      "Do give every shadow a negative spread and a warm tint (The Contact Rule).",
+      "Do ration Low Sun to the single active element, route, or hairline that matters (The One Sun Rule).",
+      "Do tune display type through --display-scale, --display-weight-delta and --display-tracking-delta rather than editing rules individually.",
+      "Do theme the surfaces the browser would otherwise own — selection, focus rings, tabular figures on numeric data.",
+      "Do test a new motion idea by asking whether it survives the narrow breakpoint. If cutting it loses nothing, it was decoration."
+    ],
+    "donts": [
+      "Don't set anything other than the word \"Solstice\" in Unbounded (The Brand Face Rule).",
+      "Don't introduce a second accent hue. Use weight, scale, or a lit surface instead.",
+      "Don't use neutral grey, pure black, or a neutral shadow anywhere (The No Neutral Rule).",
+      "Don't add a fourth scroll-pinned sequence. Three is the ration; a fourth turns the page into a slideshow.",
+      "Don't give a section a background colour because it is a new section. That is the most common way to break the day.",
+      "Don't add ratings, portraits, logos, or quotation glyphs to testimonials. Their plainness is the argument.",
+      "Don't place a map pin, a route, or a coordinate by eye. The geography is real and stays real.",
+      "Don't animate a layout property (width, height, margin, flex-basis) where a transform expresses the same change."
+    ]
+  }
+}
