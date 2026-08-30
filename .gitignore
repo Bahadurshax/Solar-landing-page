@@ -69,3 +69,11 @@ src/plugins/impeccable-live.client.ts
 /*.jpg
 /*.jpeg
 /*.mp4
+
+# Image-generation prompt drafts dropped in the root during design passes.
+# Working notes, not published content.
+grid_distortion.md
+hero_parallax_layers_prompt.md
+our_cases_mapped_by_impact_prompt.md
+solar_hero_section_prompt.md
+variant_a_how_it_works_prompt.md
