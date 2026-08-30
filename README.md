@@ -1,16 +1,72 @@
-# React + Vite
+# Solstice Energy — лендинг
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Одностраничный маркетинговый сайт для **Solstice Energy** — вымышленной
+компании по установке солнечных панелей для частных домов, работающей в
+районах Каракалпакстана (Нукус, Муйнак, Кунград, Чимбай и
+окрестные оазисные городки). Сделан как портфолио / демонстрационный проект:
+React 19 + Vite, без бэкенда, без роутера — единая композиция со скроллом,
+управляемая GSAP ScrollTrigger, Motion и Lenis.
 
-Currently, two official plugins are available:
+Весь текст, кейсы, отзывы, статистика и контакты — **вымышлены**. Единственный
+достоверный слой — `src/data/region-map.js`, где точки на карте спроецированы
+из реальных координат. Перед изменением контента см. `PRODUCT.md` (аудитория,
+позиционирование, принципы продукта), а `DESIGN.md` — для правил дизайн-системы;
+актуальная цветовая палитра — токены `--sol-*` в начале `src/styles.css`.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Превью
 
-## React Compiler
+<video src="https://raw.githubusercontent.com/Bahadurshax/Solar-landing-page/main/preview.mp4" controls muted playsinline width="100%"></video>
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Если видео не проигрывается прямо здесь — [`preview.mp4`](./preview.mp4).
 
-## Expanding the ESLint configuration
+## Быстрый старт
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev      # dev-сервер Vite
+```
+
+```bash
+npm run build    # продакшн-сборка в dist/
+npm run preview  # запуск собранного dist/
+npm run lint     # eslint по репозиторию
+```
+
+Тестов нет. Проверка — визуальная: запустить dev-сервер и прогнать страницу в
+браузере; `npm run build` и `npm run lint` — единственные автоматические
+проверки.
+
+## Стек
+
+- **React 19** + **Vite** — без роутера, без бэкенда
+- **GSAP** (`ScrollTrigger`, `@gsap/react`) — анимации, привязанные к скроллу
+- **Motion** — анимация на уровне компонентов, под контролем `MotionConfig reducedMotion="user"`
+- **Lenis** — плавный скролл на всю страницу
+- **lucide-react** — иконки
+
+## Структура
+
+```
+src/
+  App.jsx              # последовательность секций: hero, HowItWorks, FilmReveal,
+                        # OurCasesSection, AboutSection, QuoteBand,
+                        # ClosingSequence, фиксированный ContactDock
+  smoothScroll.js       # общий инстанс Lenis
+  sectionSnap.js         # единственный "снэп" на странице
+  scrollCoordinator.js    # единственный слушатель скролла на странице
+  breakpoints.js          # единственный источник медиа-запросов на JS
+  components/            # по компоненту на секцию
+  data/                   # кейсы, отзывы, карта регионов
+  styles/                 # стили по секциям
+public/images/            # плашки hero-секции, подключены по прямому пути (не через import)
+```
+
+Подробности архитектуры — в `CLAUDE.md`: почему скролл-инфраструктура
+централизована, какая секция всё ещё использует `pin`, и почему поддержка
+reduced-motion — это поддерживаемая фича, а не второстепенная деталь.
+
+## Документация по продукту и дизайну
+
+- `PRODUCT.md` — аудитория, позиционирование, что вымышлено, а что реально, принципы продукта
+- `DESIGN.md` — правила дизайн-системы и их обоснование (Hour Rule, One Sun Rule, No Neutral Rule, Contact Rule, Brand Face Rule)
+- `CLAUDE.md` — архитектура и договорённости для тех, кто (человек или агент) правит этот код
